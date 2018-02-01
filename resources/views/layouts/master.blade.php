@@ -36,7 +36,6 @@
             </div>
 
             <div class="clearfix"></div>
-
 @auth
             <!-- menu profile quick info -->
             <div class="profile clearfix">
@@ -50,14 +49,11 @@
               <div class="clearfix"></div>
             </div>
             <!-- /menu profile quick info -->
-
             <br />
 
-@endauth
 
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              @auth
               <div class="menu_section">
                 <h3>General</h3>
                 <ul class="nav side-menu">
@@ -177,9 +173,9 @@
             </div>
             <!-- /menu footer buttons -->
           </div>
-@endauth                    
         </div>
 
+@endauth
         
         <!-- top navigation -->
         <div class="top_nav">
