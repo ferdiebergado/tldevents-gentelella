@@ -975,7 +975,7 @@
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(12), __webpack_require__(13));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(11), __webpack_require__(12));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -1110,7 +1110,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(4);
-module.exports = __webpack_require__(17);
+module.exports = __webpack_require__(16);
 
 
 /***/ }),
@@ -1147,9 +1147,9 @@ try {
   __webpack_require__(6);
 } catch (e) {}
 
-/* Admin LTE */
+/* Gentelella Admin Template */
+// require('jquery-slimscroll/jquery.slimscroll.js');
 __webpack_require__(7);
-__webpack_require__(8);
 
 $.ajaxSetup({
   headers: {
@@ -1160,13 +1160,13 @@ $.ajaxSetup({
 /* Initialize Crypto-JS */
 var Base64 = __webpack_require__(1);
 
-var Hex = __webpack_require__(9);
+var Hex = __webpack_require__(8);
 
-var AES = __webpack_require__(10);
+var AES = __webpack_require__(9);
 
-var Uft8 = __webpack_require__(15);
+var Uft8 = __webpack_require__(14);
 
-var Lib = __webpack_require__(16);
+var Lib = __webpack_require__(15);
 
 var salt = 'i8ZGKfgqIeFVjPvnZrAMUWQdBIIVyUOr';
 
@@ -1274,7 +1274,7 @@ var readURL = function readURL(input) {
 
 $(function () {
 
-  $('.sidebar-menu').tree();
+  // $('.sidebar-menu').tree();
 
   $('#logout').click(function (event) {
     event.preventDefault();
@@ -1304,7 +1304,7 @@ $(function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * jQuery JavaScript Library v3.2.1
+ * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
  *
  * Includes Sizzle.js
@@ -1314,7 +1314,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2017-03-20T18:59Z
+ * Date: 2018-01-20T17:24Z
  */
 ( function( global, factory ) {
 
@@ -1376,16 +1376,57 @@ var ObjectFunctionString = fnToString.call( Object );
 
 var support = {};
 
+var isFunction = function isFunction( obj ) {
+
+      // Support: Chrome <=57, Firefox <=52
+      // In some browsers, typeof returns "function" for HTML <object> elements
+      // (i.e., `typeof document.createElement( "object" ) === "function"`).
+      // We don't want to classify *any* DOM node as a function.
+      return typeof obj === "function" && typeof obj.nodeType !== "number";
+  };
 
 
-	function DOMEval( code, doc ) {
+var isWindow = function isWindow( obj ) {
+		return obj != null && obj === obj.window;
+	};
+
+
+
+
+	var preservedScriptAttributes = {
+		type: true,
+		src: true,
+		noModule: true
+	};
+
+	function DOMEval( code, doc, node ) {
 		doc = doc || document;
 
-		var script = doc.createElement( "script" );
+		var i,
+			script = doc.createElement( "script" );
 
 		script.text = code;
+		if ( node ) {
+			for ( i in preservedScriptAttributes ) {
+				if ( node[ i ] ) {
+					script[ i ] = node[ i ];
+				}
+			}
+		}
 		doc.head.appendChild( script ).parentNode.removeChild( script );
 	}
+
+
+function toType( obj ) {
+	if ( obj == null ) {
+		return obj + "";
+	}
+
+	// Support: Android <=2.3 only (functionish RegExp)
+	return typeof obj === "object" || typeof obj === "function" ?
+		class2type[ toString.call( obj ) ] || "object" :
+		typeof obj;
+}
 /* global Symbol */
 // Defining this global in .eslintrc.json would create a danger of using the global
 // unguarded in another place, it seems safer to define global only for this module
@@ -1393,7 +1434,7 @@ var support = {};
 
 
 var
-	version = "3.2.1",
+	version = "3.3.1",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -1405,16 +1446,7 @@ var
 
 	// Support: Android <=4.0 only
 	// Make sure we trim BOM and NBSP
-	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
-
-	// Matches dashed string for camelizing
-	rmsPrefix = /^-ms-/,
-	rdashAlpha = /-([a-z])/g,
-
-	// Used by jQuery.camelCase as callback to replace()
-	fcamelCase = function( all, letter ) {
-		return letter.toUpperCase();
-	};
+	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
 
 jQuery.fn = jQuery.prototype = {
 
@@ -1514,7 +1546,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 	}
 
 	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {
+	if ( typeof target !== "object" && !isFunction( target ) ) {
 		target = {};
 	}
 
@@ -1580,28 +1612,6 @@ jQuery.extend( {
 
 	noop: function() {},
 
-	isFunction: function( obj ) {
-		return jQuery.type( obj ) === "function";
-	},
-
-	isWindow: function( obj ) {
-		return obj != null && obj === obj.window;
-	},
-
-	isNumeric: function( obj ) {
-
-		// As of jQuery 3.0, isNumeric is limited to
-		// strings and numbers (primitives or objects)
-		// that can be coerced to finite numbers (gh-2662)
-		var type = jQuery.type( obj );
-		return ( type === "number" || type === "string" ) &&
-
-			// parseFloat NaNs numeric-cast false positives ("")
-			// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
-			// subtraction forces infinities to NaN
-			!isNaN( obj - parseFloat( obj ) );
-	},
-
 	isPlainObject: function( obj ) {
 		var proto, Ctor;
 
@@ -1635,27 +1645,9 @@ jQuery.extend( {
 		return true;
 	},
 
-	type: function( obj ) {
-		if ( obj == null ) {
-			return obj + "";
-		}
-
-		// Support: Android <=2.3 only (functionish RegExp)
-		return typeof obj === "object" || typeof obj === "function" ?
-			class2type[ toString.call( obj ) ] || "object" :
-			typeof obj;
-	},
-
 	// Evaluates a script in a global context
 	globalEval: function( code ) {
 		DOMEval( code );
-	},
-
-	// Convert dashed to camelCase; used by the css and data modules
-	// Support: IE <=9 - 11, Edge 12 - 13
-	// Microsoft forgot to hump their vendor prefix (#9572)
-	camelCase: function( string ) {
-		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
 	},
 
 	each: function( obj, callback ) {
@@ -1778,37 +1770,6 @@ jQuery.extend( {
 	// A global GUID counter for objects
 	guid: 1,
 
-	// Bind a function to a context, optionally partially applying any
-	// arguments.
-	proxy: function( fn, context ) {
-		var tmp, args, proxy;
-
-		if ( typeof context === "string" ) {
-			tmp = fn[ context ];
-			context = fn;
-			fn = tmp;
-		}
-
-		// Quick check to determine if target is callable, in the spec
-		// this throws a TypeError, but we will just return undefined.
-		if ( !jQuery.isFunction( fn ) ) {
-			return undefined;
-		}
-
-		// Simulated bind
-		args = slice.call( arguments, 2 );
-		proxy = function() {
-			return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
-		};
-
-		// Set the guid of unique handler to the same of original handler, so it can be removed
-		proxy.guid = fn.guid = fn.guid || jQuery.guid++;
-
-		return proxy;
-	},
-
-	now: Date.now,
-
 	// jQuery.support is not used in Core but other projects attach their
 	// properties to it so it needs to exist.
 	support: support
@@ -1831,9 +1792,9 @@ function isArrayLike( obj ) {
 	// hasOwn isn't used here due to false negatives
 	// regarding Nodelist length in IE
 	var length = !!obj && "length" in obj && obj.length,
-		type = jQuery.type( obj );
+		type = toType( obj );
 
-	if ( type === "function" || jQuery.isWindow( obj ) ) {
+	if ( isFunction( obj ) || isWindow( obj ) ) {
 		return false;
 	}
 
@@ -4153,11 +4114,9 @@ var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|
 
 
 
-var risSimple = /^.[^:#\[\.,]*$/;
-
 // Implement the identical functionality for filter and not
 function winnow( elements, qualifier, not ) {
-	if ( jQuery.isFunction( qualifier ) ) {
+	if ( isFunction( qualifier ) ) {
 		return jQuery.grep( elements, function( elem, i ) {
 			return !!qualifier.call( elem, i, elem ) !== not;
 		} );
@@ -4177,16 +4136,8 @@ function winnow( elements, qualifier, not ) {
 		} );
 	}
 
-	// Simple selector that can be filtered directly, removing non-Elements
-	if ( risSimple.test( qualifier ) ) {
-		return jQuery.filter( qualifier, elements, not );
-	}
-
-	// Complex selector, compare the two sets, removing non-Elements
-	qualifier = jQuery.filter( qualifier, elements );
-	return jQuery.grep( elements, function( elem ) {
-		return ( indexOf.call( qualifier, elem ) > -1 ) !== not && elem.nodeType === 1;
-	} );
+	// Filtered directly for both simple and complex selectors
+	return jQuery.filter( qualifier, elements, not );
 }
 
 jQuery.filter = function( expr, elems, not ) {
@@ -4307,7 +4258,7 @@ var rootjQuery,
 						for ( match in context ) {
 
 							// Properties of context are called as methods if possible
-							if ( jQuery.isFunction( this[ match ] ) ) {
+							if ( isFunction( this[ match ] ) ) {
 								this[ match ]( context[ match ] );
 
 							// ...and otherwise set as attributes
@@ -4350,7 +4301,7 @@ var rootjQuery,
 
 		// HANDLE: $(function)
 		// Shortcut for document ready
-		} else if ( jQuery.isFunction( selector ) ) {
+		} else if ( isFunction( selector ) ) {
 			return root.ready !== undefined ?
 				root.ready( selector ) :
 
@@ -4665,11 +4616,11 @@ jQuery.Callbacks = function( options ) {
 
 					( function add( args ) {
 						jQuery.each( args, function( _, arg ) {
-							if ( jQuery.isFunction( arg ) ) {
+							if ( isFunction( arg ) ) {
 								if ( !options.unique || !self.has( arg ) ) {
 									list.push( arg );
 								}
-							} else if ( arg && arg.length && jQuery.type( arg ) !== "string" ) {
+							} else if ( arg && arg.length && toType( arg ) !== "string" ) {
 
 								// Inspect recursively
 								add( arg );
@@ -4784,11 +4735,11 @@ function adoptValue( value, resolve, reject, noValue ) {
 	try {
 
 		// Check for promise aspect first to privilege synchronous behavior
-		if ( value && jQuery.isFunction( ( method = value.promise ) ) ) {
+		if ( value && isFunction( ( method = value.promise ) ) ) {
 			method.call( value ).done( resolve ).fail( reject );
 
 		// Other thenables
-		} else if ( value && jQuery.isFunction( ( method = value.then ) ) ) {
+		} else if ( value && isFunction( ( method = value.then ) ) ) {
 			method.call( value, resolve, reject );
 
 		// Other non-thenables
@@ -4846,14 +4797,14 @@ jQuery.extend( {
 						jQuery.each( tuples, function( i, tuple ) {
 
 							// Map tuples (progress, done, fail) to arguments (done, fail, progress)
-							var fn = jQuery.isFunction( fns[ tuple[ 4 ] ] ) && fns[ tuple[ 4 ] ];
+							var fn = isFunction( fns[ tuple[ 4 ] ] ) && fns[ tuple[ 4 ] ];
 
 							// deferred.progress(function() { bind to newDefer or newDefer.notify })
 							// deferred.done(function() { bind to newDefer or newDefer.resolve })
 							// deferred.fail(function() { bind to newDefer or newDefer.reject })
 							deferred[ tuple[ 1 ] ]( function() {
 								var returned = fn && fn.apply( this, arguments );
-								if ( returned && jQuery.isFunction( returned.promise ) ) {
+								if ( returned && isFunction( returned.promise ) ) {
 									returned.promise()
 										.progress( newDefer.notify )
 										.done( newDefer.resolve )
@@ -4907,7 +4858,7 @@ jQuery.extend( {
 										returned.then;
 
 									// Handle a returned thenable
-									if ( jQuery.isFunction( then ) ) {
+									if ( isFunction( then ) ) {
 
 										// Special processors (notify) just wait for resolution
 										if ( special ) {
@@ -5003,7 +4954,7 @@ jQuery.extend( {
 							resolve(
 								0,
 								newDefer,
-								jQuery.isFunction( onProgress ) ?
+								isFunction( onProgress ) ?
 									onProgress :
 									Identity,
 								newDefer.notifyWith
@@ -5015,7 +4966,7 @@ jQuery.extend( {
 							resolve(
 								0,
 								newDefer,
-								jQuery.isFunction( onFulfilled ) ?
+								isFunction( onFulfilled ) ?
 									onFulfilled :
 									Identity
 							)
@@ -5026,7 +4977,7 @@ jQuery.extend( {
 							resolve(
 								0,
 								newDefer,
-								jQuery.isFunction( onRejected ) ?
+								isFunction( onRejected ) ?
 									onRejected :
 									Thrower
 							)
@@ -5066,8 +5017,15 @@ jQuery.extend( {
 					// fulfilled_callbacks.disable
 					tuples[ 3 - i ][ 2 ].disable,
 
+					// rejected_handlers.disable
+					// fulfilled_handlers.disable
+					tuples[ 3 - i ][ 3 ].disable,
+
 					// progress_callbacks.lock
-					tuples[ 0 ][ 2 ].lock
+					tuples[ 0 ][ 2 ].lock,
+
+					// progress_handlers.lock
+					tuples[ 0 ][ 3 ].lock
 				);
 			}
 
@@ -5137,7 +5095,7 @@ jQuery.extend( {
 
 			// Use .then() to unwrap secondary thenables (cf. gh-3000)
 			if ( master.state() === "pending" ||
-				jQuery.isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
+				isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
 
 				return master.then();
 			}
@@ -5265,7 +5223,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		bulk = key == null;
 
 	// Sets many values
-	if ( jQuery.type( key ) === "object" ) {
+	if ( toType( key ) === "object" ) {
 		chainable = true;
 		for ( i in key ) {
 			access( elems, fn, i, key[ i ], true, emptyGet, raw );
@@ -5275,7 +5233,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 	} else if ( value !== undefined ) {
 		chainable = true;
 
-		if ( !jQuery.isFunction( value ) ) {
+		if ( !isFunction( value ) ) {
 			raw = true;
 		}
 
@@ -5317,6 +5275,23 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 
 	return len ? fn( elems[ 0 ], key ) : emptyGet;
 };
+
+
+// Matches dashed string for camelizing
+var rmsPrefix = /^-ms-/,
+	rdashAlpha = /-([a-z])/g;
+
+// Used by camelCase as callback to replace()
+function fcamelCase( all, letter ) {
+	return letter.toUpperCase();
+}
+
+// Convert dashed to camelCase; used by the css and data modules
+// Support: IE <=9 - 11, Edge 12 - 15
+// Microsoft forgot to hump their vendor prefix (#9572)
+function camelCase( string ) {
+	return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
+}
 var acceptData = function( owner ) {
 
 	// Accepts only:
@@ -5379,14 +5354,14 @@ Data.prototype = {
 		// Handle: [ owner, key, value ] args
 		// Always use camelCase key (gh-2257)
 		if ( typeof data === "string" ) {
-			cache[ jQuery.camelCase( data ) ] = value;
+			cache[ camelCase( data ) ] = value;
 
 		// Handle: [ owner, { properties } ] args
 		} else {
 
 			// Copy the properties one-by-one to the cache object
 			for ( prop in data ) {
-				cache[ jQuery.camelCase( prop ) ] = data[ prop ];
+				cache[ camelCase( prop ) ] = data[ prop ];
 			}
 		}
 		return cache;
@@ -5396,7 +5371,7 @@ Data.prototype = {
 			this.cache( owner ) :
 
 			// Always use camelCase key (gh-2257)
-			owner[ this.expando ] && owner[ this.expando ][ jQuery.camelCase( key ) ];
+			owner[ this.expando ] && owner[ this.expando ][ camelCase( key ) ];
 	},
 	access: function( owner, key, value ) {
 
@@ -5444,9 +5419,9 @@ Data.prototype = {
 
 				// If key is an array of keys...
 				// We always set camelCase keys, so remove that.
-				key = key.map( jQuery.camelCase );
+				key = key.map( camelCase );
 			} else {
-				key = jQuery.camelCase( key );
+				key = camelCase( key );
 
 				// If a key with the spaces exists, use it.
 				// Otherwise, create an array by matching non-whitespace
@@ -5592,7 +5567,7 @@ jQuery.fn.extend( {
 						if ( attrs[ i ] ) {
 							name = attrs[ i ].name;
 							if ( name.indexOf( "data-" ) === 0 ) {
-								name = jQuery.camelCase( name.slice( 5 ) );
+								name = camelCase( name.slice( 5 ) );
 								dataAttr( elem, name, data[ name ] );
 							}
 						}
@@ -5839,8 +5814,7 @@ var swap = function( elem, options, callback, args ) {
 
 
 function adjustCSS( elem, prop, valueParts, tween ) {
-	var adjusted,
-		scale = 1,
+	var adjusted, scale,
 		maxIterations = 20,
 		currentValue = tween ?
 			function() {
@@ -5858,30 +5832,33 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 
 	if ( initialInUnit && initialInUnit[ 3 ] !== unit ) {
 
+		// Support: Firefox <=54
+		// Halve the iteration target value to prevent interference from CSS upper bounds (gh-2144)
+		initial = initial / 2;
+
 		// Trust units reported by jQuery.css
 		unit = unit || initialInUnit[ 3 ];
-
-		// Make sure we update the tween properties later on
-		valueParts = valueParts || [];
 
 		// Iteratively approximate from a nonzero starting point
 		initialInUnit = +initial || 1;
 
-		do {
+		while ( maxIterations-- ) {
 
-			// If previous iteration zeroed out, double until we get *something*.
-			// Use string for doubling so we don't accidentally see scale as unchanged below
-			scale = scale || ".5";
-
-			// Adjust and apply
-			initialInUnit = initialInUnit / scale;
+			// Evaluate and update our best guess (doubling guesses that zero out).
+			// Finish if the scale equals or crosses 1 (making the old*new product non-positive).
 			jQuery.style( elem, prop, initialInUnit + unit );
+			if ( ( 1 - scale ) * ( 1 - ( scale = currentValue() / initial || 0.5 ) ) <= 0 ) {
+				maxIterations = 0;
+			}
+			initialInUnit = initialInUnit / scale;
 
-		// Update scale, tolerating zero or NaN from tween.cur()
-		// Break the loop if scale is unchanged or perfect, or if we've just had enough.
-		} while (
-			scale !== ( scale = currentValue() / initial ) && scale !== 1 && --maxIterations
-		);
+		}
+
+		initialInUnit = initialInUnit * 2;
+		jQuery.style( elem, prop, initialInUnit + unit );
+
+		// Make sure we update the tween properties later on
+		valueParts = valueParts || [];
 	}
 
 	if ( valueParts ) {
@@ -5999,7 +5976,7 @@ var rcheckableType = ( /^(?:checkbox|radio)$/i );
 
 var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]+)/i );
 
-var rscriptType = ( /^$|\/(?:java|ecma)script/i );
+var rscriptType = ( /^$|^module$|\/(?:java|ecma)script/i );
 
 
 
@@ -6081,7 +6058,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 		if ( elem || elem === 0 ) {
 
 			// Add nodes directly
-			if ( jQuery.type( elem ) === "object" ) {
+			if ( toType( elem ) === "object" ) {
 
 				// Support: Android <=4.0 only, PhantomJS 1 only
 				// push.apply(_, arraylike) throws on ancient WebKit
@@ -6591,7 +6568,7 @@ jQuery.event = {
 			enumerable: true,
 			configurable: true,
 
-			get: jQuery.isFunction( hook ) ?
+			get: isFunction( hook ) ?
 				function() {
 					if ( this.originalEvent ) {
 							return hook( this.originalEvent );
@@ -6726,7 +6703,7 @@ jQuery.Event = function( src, props ) {
 	}
 
 	// Create a timestamp if incoming event doesn't have one
-	this.timeStamp = src && src.timeStamp || jQuery.now();
+	this.timeStamp = src && src.timeStamp || Date.now();
 
 	// Mark it as fixed
 	this[ jQuery.expando ] = true;
@@ -6925,14 +6902,13 @@ var
 
 	/* eslint-enable */
 
-	// Support: IE <=10 - 11, Edge 12 - 13
+	// Support: IE <=10 - 11, Edge 12 - 13 only
 	// In IE/Edge using regex groups here causes severe slowdowns.
 	// See https://connect.microsoft.com/IE/feedback/details/1736512/
 	rnoInnerhtml = /<script|<style|<link/i,
 
 	// checked="checked" or checked
 	rchecked = /checked\s*(?:[^=]|=\s*.checked.)/i,
-	rscriptTypeMasked = /^true\/(.*)/,
 	rcleanScript = /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g;
 
 // Prefer a tbody over its parent table for containing new rows
@@ -6940,7 +6916,7 @@ function manipulationTarget( elem, content ) {
 	if ( nodeName( elem, "table" ) &&
 		nodeName( content.nodeType !== 11 ? content : content.firstChild, "tr" ) ) {
 
-		return jQuery( ">tbody", elem )[ 0 ] || elem;
+		return jQuery( elem ).children( "tbody" )[ 0 ] || elem;
 	}
 
 	return elem;
@@ -6952,10 +6928,8 @@ function disableScript( elem ) {
 	return elem;
 }
 function restoreScript( elem ) {
-	var match = rscriptTypeMasked.exec( elem.type );
-
-	if ( match ) {
-		elem.type = match[ 1 ];
+	if ( ( elem.type || "" ).slice( 0, 5 ) === "true/" ) {
+		elem.type = elem.type.slice( 5 );
 	} else {
 		elem.removeAttribute( "type" );
 	}
@@ -7021,15 +6995,15 @@ function domManip( collection, args, callback, ignored ) {
 		l = collection.length,
 		iNoClone = l - 1,
 		value = args[ 0 ],
-		isFunction = jQuery.isFunction( value );
+		valueIsFunction = isFunction( value );
 
 	// We can't cloneNode fragments that contain checked, in WebKit
-	if ( isFunction ||
+	if ( valueIsFunction ||
 			( l > 1 && typeof value === "string" &&
 				!support.checkClone && rchecked.test( value ) ) ) {
 		return collection.each( function( index ) {
 			var self = collection.eq( index );
-			if ( isFunction ) {
+			if ( valueIsFunction ) {
 				args[ 0 ] = value.call( this, index, self.html() );
 			}
 			domManip( self, args, callback, ignored );
@@ -7083,14 +7057,14 @@ function domManip( collection, args, callback, ignored ) {
 						!dataPriv.access( node, "globalEval" ) &&
 						jQuery.contains( doc, node ) ) {
 
-						if ( node.src ) {
+						if ( node.src && ( node.type || "" ).toLowerCase()  !== "module" ) {
 
 							// Optional AJAX dependency, but won't run scripts if not present
 							if ( jQuery._evalUrl ) {
 								jQuery._evalUrl( node.src );
 							}
 						} else {
-							DOMEval( node.textContent.replace( rcleanScript, "" ), doc );
+							DOMEval( node.textContent.replace( rcleanScript, "" ), doc, node );
 						}
 					}
 				}
@@ -7370,8 +7344,6 @@ jQuery.each( {
 		return this.pushStack( ret );
 	};
 } );
-var rmargin = ( /^margin/ );
-
 var rnumnonpx = new RegExp( "^(" + pnum + ")(?!px)[a-z%]+$", "i" );
 
 var getStyles = function( elem ) {
@@ -7388,6 +7360,8 @@ var getStyles = function( elem ) {
 		return view.getComputedStyle( elem );
 	};
 
+var rboxStyle = new RegExp( cssExpand.join( "|" ), "i" );
+
 
 
 ( function() {
@@ -7401,25 +7375,33 @@ var getStyles = function( elem ) {
 			return;
 		}
 
+		container.style.cssText = "position:absolute;left:-11111px;width:60px;" +
+			"margin-top:1px;padding:0;border:0";
 		div.style.cssText =
-			"box-sizing:border-box;" +
-			"position:relative;display:block;" +
+			"position:relative;display:block;box-sizing:border-box;overflow:scroll;" +
 			"margin:auto;border:1px;padding:1px;" +
-			"top:1%;width:50%";
-		div.innerHTML = "";
-		documentElement.appendChild( container );
+			"width:60%;top:1%";
+		documentElement.appendChild( container ).appendChild( div );
 
 		var divStyle = window.getComputedStyle( div );
 		pixelPositionVal = divStyle.top !== "1%";
 
 		// Support: Android 4.0 - 4.3 only, Firefox <=3 - 44
-		reliableMarginLeftVal = divStyle.marginLeft === "2px";
-		boxSizingReliableVal = divStyle.width === "4px";
+		reliableMarginLeftVal = roundPixelMeasures( divStyle.marginLeft ) === 12;
 
-		// Support: Android 4.0 - 4.3 only
+		// Support: Android 4.0 - 4.3 only, Safari <=9.1 - 10.1, iOS <=7.0 - 9.3
 		// Some styles come back with percentage values, even though they shouldn't
-		div.style.marginRight = "50%";
-		pixelMarginRightVal = divStyle.marginRight === "4px";
+		div.style.right = "60%";
+		pixelBoxStylesVal = roundPixelMeasures( divStyle.right ) === 36;
+
+		// Support: IE 9 - 11 only
+		// Detect misreporting of content dimensions for box-sizing:border-box elements
+		boxSizingReliableVal = roundPixelMeasures( divStyle.width ) === 36;
+
+		// Support: IE 9 only
+		// Detect overflow:scroll screwiness (gh-3699)
+		div.style.position = "absolute";
+		scrollboxSizeVal = div.offsetWidth === 36 || "absolute";
 
 		documentElement.removeChild( container );
 
@@ -7428,7 +7410,12 @@ var getStyles = function( elem ) {
 		div = null;
 	}
 
-	var pixelPositionVal, boxSizingReliableVal, pixelMarginRightVal, reliableMarginLeftVal,
+	function roundPixelMeasures( measure ) {
+		return Math.round( parseFloat( measure ) );
+	}
+
+	var pixelPositionVal, boxSizingReliableVal, scrollboxSizeVal, pixelBoxStylesVal,
+		reliableMarginLeftVal,
 		container = document.createElement( "div" ),
 		div = document.createElement( "div" );
 
@@ -7443,26 +7430,26 @@ var getStyles = function( elem ) {
 	div.cloneNode( true ).style.backgroundClip = "";
 	support.clearCloneStyle = div.style.backgroundClip === "content-box";
 
-	container.style.cssText = "border:0;width:8px;height:0;top:0;left:-9999px;" +
-		"padding:0;margin-top:1px;position:absolute";
-	container.appendChild( div );
-
 	jQuery.extend( support, {
-		pixelPosition: function() {
-			computeStyleTests();
-			return pixelPositionVal;
-		},
 		boxSizingReliable: function() {
 			computeStyleTests();
 			return boxSizingReliableVal;
 		},
-		pixelMarginRight: function() {
+		pixelBoxStyles: function() {
 			computeStyleTests();
-			return pixelMarginRightVal;
+			return pixelBoxStylesVal;
+		},
+		pixelPosition: function() {
+			computeStyleTests();
+			return pixelPositionVal;
 		},
 		reliableMarginLeft: function() {
 			computeStyleTests();
 			return reliableMarginLeftVal;
+		},
+		scrollboxSize: function() {
+			computeStyleTests();
+			return scrollboxSizeVal;
 		}
 	} );
 } )();
@@ -7494,7 +7481,7 @@ function curCSS( elem, name, computed ) {
 		// but width seems to be reliably pixels.
 		// This is against the CSSOM draft spec:
 		// https://drafts.csswg.org/cssom/#resolved-values
-		if ( !support.pixelMarginRight() && rnumnonpx.test( ret ) && rmargin.test( name ) ) {
+		if ( !support.pixelBoxStyles() && rnumnonpx.test( ret ) && rboxStyle.test( name ) ) {
 
 			// Remember the original values
 			width = style.width;
@@ -7599,87 +7586,120 @@ function setPositiveNumber( elem, value, subtract ) {
 		value;
 }
 
-function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {
-	var i,
-		val = 0;
+function boxModelAdjustment( elem, dimension, box, isBorderBox, styles, computedVal ) {
+	var i = dimension === "width" ? 1 : 0,
+		extra = 0,
+		delta = 0;
 
-	// If we already have the right measurement, avoid augmentation
-	if ( extra === ( isBorderBox ? "border" : "content" ) ) {
-		i = 4;
-
-	// Otherwise initialize for horizontal or vertical properties
-	} else {
-		i = name === "width" ? 1 : 0;
+	// Adjustment may not be necessary
+	if ( box === ( isBorderBox ? "border" : "content" ) ) {
+		return 0;
 	}
 
 	for ( ; i < 4; i += 2 ) {
 
-		// Both box models exclude margin, so add it if we want it
-		if ( extra === "margin" ) {
-			val += jQuery.css( elem, extra + cssExpand[ i ], true, styles );
+		// Both box models exclude margin
+		if ( box === "margin" ) {
+			delta += jQuery.css( elem, box + cssExpand[ i ], true, styles );
 		}
 
-		if ( isBorderBox ) {
+		// If we get here with a content-box, we're seeking "padding" or "border" or "margin"
+		if ( !isBorderBox ) {
 
-			// border-box includes padding, so remove it if we want content
-			if ( extra === "content" ) {
-				val -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			// Add padding
+			delta += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+
+			// For "border" or "margin", add border
+			if ( box !== "padding" ) {
+				delta += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
+
+			// But still keep track of it otherwise
+			} else {
+				extra += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 			}
 
-			// At this point, extra isn't border nor margin, so remove border
-			if ( extra !== "margin" ) {
-				val -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
-			}
+		// If we get here with a border-box (content + padding + border), we're seeking "content" or
+		// "padding" or "margin"
 		} else {
 
-			// At this point, extra isn't content, so add padding
-			val += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			// For "content", subtract padding
+			if ( box === "content" ) {
+				delta -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			}
 
-			// At this point, extra isn't content nor padding, so add border
-			if ( extra !== "padding" ) {
-				val += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
+			// For "content" or "padding", subtract border
+			if ( box !== "margin" ) {
+				delta -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 			}
 		}
 	}
 
-	return val;
+	// Account for positive content-box scroll gutter when requested by providing computedVal
+	if ( !isBorderBox && computedVal >= 0 ) {
+
+		// offsetWidth/offsetHeight is a rounded sum of content, padding, scroll gutter, and border
+		// Assuming integer scroll gutter, subtract the rest and round down
+		delta += Math.max( 0, Math.ceil(
+			elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ] -
+			computedVal -
+			delta -
+			extra -
+			0.5
+		) );
+	}
+
+	return delta;
 }
 
-function getWidthOrHeight( elem, name, extra ) {
+function getWidthOrHeight( elem, dimension, extra ) {
 
 	// Start with computed style
-	var valueIsBorderBox,
-		styles = getStyles( elem ),
-		val = curCSS( elem, name, styles ),
-		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
+	var styles = getStyles( elem ),
+		val = curCSS( elem, dimension, styles ),
+		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+		valueIsBorderBox = isBorderBox;
 
-	// Computed unit is not pixels. Stop here and return.
+	// Support: Firefox <=54
+	// Return a confounding non-pixel value or feign ignorance, as appropriate.
 	if ( rnumnonpx.test( val ) ) {
-		return val;
+		if ( !extra ) {
+			return val;
+		}
+		val = "auto";
 	}
 
 	// Check for style in case a browser which returns unreliable values
 	// for getComputedStyle silently falls back to the reliable elem.style
-	valueIsBorderBox = isBorderBox &&
-		( support.boxSizingReliable() || val === elem.style[ name ] );
+	valueIsBorderBox = valueIsBorderBox &&
+		( support.boxSizingReliable() || val === elem.style[ dimension ] );
 
-	// Fall back to offsetWidth/Height when value is "auto"
+	// Fall back to offsetWidth/offsetHeight when value is "auto"
 	// This happens for inline elements with no explicit setting (gh-3571)
-	if ( val === "auto" ) {
-		val = elem[ "offset" + name[ 0 ].toUpperCase() + name.slice( 1 ) ];
+	// Support: Android <=4.1 - 4.3 only
+	// Also use offsetWidth/offsetHeight for misreported inline dimensions (gh-3602)
+	if ( val === "auto" ||
+		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) {
+
+		val = elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ];
+
+		// offsetWidth/offsetHeight provide border-box values
+		valueIsBorderBox = true;
 	}
 
-	// Normalize "", auto, and prepare for extra
+	// Normalize "" and auto
 	val = parseFloat( val ) || 0;
 
-	// Use the active box-sizing model to add/subtract irrelevant styles
+	// Adjust for the element's box model
 	return ( val +
-		augmentWidthOrHeight(
+		boxModelAdjustment(
 			elem,
-			name,
+			dimension,
 			extra || ( isBorderBox ? "border" : "content" ),
 			valueIsBorderBox,
-			styles
+			styles,
+
+			// Provide the current computed size to request scroll gutter calculation (gh-3589)
+			val
 		)
 	) + "px";
 }
@@ -7720,9 +7740,7 @@ jQuery.extend( {
 
 	// Add in properties whose names you wish to fix before
 	// setting or getting the value
-	cssProps: {
-		"float": "cssFloat"
-	},
+	cssProps: {},
 
 	// Get and set the style property on a DOM Node
 	style: function( elem, name, value, extra ) {
@@ -7734,7 +7752,7 @@ jQuery.extend( {
 
 		// Make sure that we're working with the right name
 		var ret, type, hooks,
-			origName = jQuery.camelCase( name ),
+			origName = camelCase( name ),
 			isCustomProp = rcustomProp.test( name ),
 			style = elem.style;
 
@@ -7802,7 +7820,7 @@ jQuery.extend( {
 
 	css: function( elem, name, extra, styles ) {
 		var val, num, hooks,
-			origName = jQuery.camelCase( name ),
+			origName = camelCase( name ),
 			isCustomProp = rcustomProp.test( name );
 
 		// Make sure that we're working with the right name. We don't
@@ -7840,8 +7858,8 @@ jQuery.extend( {
 	}
 } );
 
-jQuery.each( [ "height", "width" ], function( i, name ) {
-	jQuery.cssHooks[ name ] = {
+jQuery.each( [ "height", "width" ], function( i, dimension ) {
+	jQuery.cssHooks[ dimension ] = {
 		get: function( elem, computed, extra ) {
 			if ( computed ) {
 
@@ -7857,29 +7875,41 @@ jQuery.each( [ "height", "width" ], function( i, name ) {
 					// in IE throws an error.
 					( !elem.getClientRects().length || !elem.getBoundingClientRect().width ) ?
 						swap( elem, cssShow, function() {
-							return getWidthOrHeight( elem, name, extra );
+							return getWidthOrHeight( elem, dimension, extra );
 						} ) :
-						getWidthOrHeight( elem, name, extra );
+						getWidthOrHeight( elem, dimension, extra );
 			}
 		},
 
 		set: function( elem, value, extra ) {
 			var matches,
-				styles = extra && getStyles( elem ),
-				subtract = extra && augmentWidthOrHeight(
+				styles = getStyles( elem ),
+				isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+				subtract = extra && boxModelAdjustment(
 					elem,
-					name,
+					dimension,
 					extra,
-					jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+					isBorderBox,
 					styles
 				);
+
+			// Account for unreliable border-box dimensions by comparing offset* to computed and
+			// faking a content-box to get border and padding (gh-3699)
+			if ( isBorderBox && support.scrollboxSize() === styles.position ) {
+				subtract -= Math.ceil(
+					elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ] -
+					parseFloat( styles[ dimension ] ) -
+					boxModelAdjustment( elem, dimension, "border", false, styles ) -
+					0.5
+				);
+			}
 
 			// Convert to pixels if value adjustment is needed
 			if ( subtract && ( matches = rcssNum.exec( value ) ) &&
 				( matches[ 3 ] || "px" ) !== "px" ) {
 
-				elem.style[ name ] = value;
-				value = jQuery.css( elem, name );
+				elem.style[ dimension ] = value;
+				value = jQuery.css( elem, dimension );
 			}
 
 			return setPositiveNumber( elem, value, subtract );
@@ -7923,7 +7953,7 @@ jQuery.each( {
 		}
 	};
 
-	if ( !rmargin.test( prefix ) ) {
+	if ( prefix !== "margin" ) {
 		jQuery.cssHooks[ prefix + suffix ].set = setPositiveNumber;
 	}
 } );
@@ -8094,7 +8124,7 @@ function createFxNow() {
 	window.setTimeout( function() {
 		fxNow = undefined;
 	} );
-	return ( fxNow = jQuery.now() );
+	return ( fxNow = Date.now() );
 }
 
 // Generate parameters to create a standard animation
@@ -8198,9 +8228,10 @@ function defaultPrefilter( elem, props, opts ) {
 	// Restrict "overflow" and "display" styles during box animations
 	if ( isBox && elem.nodeType === 1 ) {
 
-		// Support: IE <=9 - 11, Edge 12 - 13
+		// Support: IE <=9 - 11, Edge 12 - 15
 		// Record all 3 overflow attributes because IE does not infer the shorthand
-		// from identically-valued overflowX and overflowY
+		// from identically-valued overflowX and overflowY and Edge just mirrors
+		// the overflowX value there.
 		opts.overflow = [ style.overflow, style.overflowX, style.overflowY ];
 
 		// Identify a display type, preferring old show/hide data over the CSS cascade
@@ -8308,7 +8339,7 @@ function propFilter( props, specialEasing ) {
 
 	// camelCase, specialEasing and expand cssHook pass
 	for ( index in props ) {
-		name = jQuery.camelCase( index );
+		name = camelCase( index );
 		easing = specialEasing[ name ];
 		value = props[ index ];
 		if ( Array.isArray( value ) ) {
@@ -8433,9 +8464,9 @@ function Animation( elem, properties, options ) {
 	for ( ; index < length; index++ ) {
 		result = Animation.prefilters[ index ].call( animation, elem, props, animation.opts );
 		if ( result ) {
-			if ( jQuery.isFunction( result.stop ) ) {
+			if ( isFunction( result.stop ) ) {
 				jQuery._queueHooks( animation.elem, animation.opts.queue ).stop =
-					jQuery.proxy( result.stop, result );
+					result.stop.bind( result );
 			}
 			return result;
 		}
@@ -8443,7 +8474,7 @@ function Animation( elem, properties, options ) {
 
 	jQuery.map( props, createTween, animation );
 
-	if ( jQuery.isFunction( animation.opts.start ) ) {
+	if ( isFunction( animation.opts.start ) ) {
 		animation.opts.start.call( elem, animation );
 	}
 
@@ -8476,7 +8507,7 @@ jQuery.Animation = jQuery.extend( Animation, {
 	},
 
 	tweener: function( props, callback ) {
-		if ( jQuery.isFunction( props ) ) {
+		if ( isFunction( props ) ) {
 			callback = props;
 			props = [ "*" ];
 		} else {
@@ -8508,9 +8539,9 @@ jQuery.Animation = jQuery.extend( Animation, {
 jQuery.speed = function( speed, easing, fn ) {
 	var opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
 		complete: fn || !fn && easing ||
-			jQuery.isFunction( speed ) && speed,
+			isFunction( speed ) && speed,
 		duration: speed,
-		easing: fn && easing || easing && !jQuery.isFunction( easing ) && easing
+		easing: fn && easing || easing && !isFunction( easing ) && easing
 	};
 
 	// Go to the end state if fx are off
@@ -8537,7 +8568,7 @@ jQuery.speed = function( speed, easing, fn ) {
 	opt.old = opt.complete;
 
 	opt.complete = function() {
-		if ( jQuery.isFunction( opt.old ) ) {
+		if ( isFunction( opt.old ) ) {
 			opt.old.call( this );
 		}
 
@@ -8701,7 +8732,7 @@ jQuery.fx.tick = function() {
 		i = 0,
 		timers = jQuery.timers;
 
-	fxNow = jQuery.now();
+	fxNow = Date.now();
 
 	for ( ; i < timers.length; i++ ) {
 		timer = timers[ i ];
@@ -9054,7 +9085,7 @@ jQuery.each( [
 
 
 	// Strip and collapse whitespace according to HTML spec
-	// https://html.spec.whatwg.org/multipage/infrastructure.html#strip-and-collapse-whitespace
+	// https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace
 	function stripAndCollapse( value ) {
 		var tokens = value.match( rnothtmlwhite ) || [];
 		return tokens.join( " " );
@@ -9065,20 +9096,30 @@ function getClass( elem ) {
 	return elem.getAttribute && elem.getAttribute( "class" ) || "";
 }
 
+function classesToArray( value ) {
+	if ( Array.isArray( value ) ) {
+		return value;
+	}
+	if ( typeof value === "string" ) {
+		return value.match( rnothtmlwhite ) || [];
+	}
+	return [];
+}
+
 jQuery.fn.extend( {
 	addClass: function( value ) {
 		var classes, elem, cur, curValue, clazz, j, finalValue,
 			i = 0;
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( isFunction( value ) ) {
 			return this.each( function( j ) {
 				jQuery( this ).addClass( value.call( this, j, getClass( this ) ) );
 			} );
 		}
 
-		if ( typeof value === "string" && value ) {
-			classes = value.match( rnothtmlwhite ) || [];
+		classes = classesToArray( value );
 
+		if ( classes.length ) {
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
 				cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
@@ -9107,7 +9148,7 @@ jQuery.fn.extend( {
 		var classes, elem, cur, curValue, clazz, j, finalValue,
 			i = 0;
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( isFunction( value ) ) {
 			return this.each( function( j ) {
 				jQuery( this ).removeClass( value.call( this, j, getClass( this ) ) );
 			} );
@@ -9117,9 +9158,9 @@ jQuery.fn.extend( {
 			return this.attr( "class", "" );
 		}
 
-		if ( typeof value === "string" && value ) {
-			classes = value.match( rnothtmlwhite ) || [];
+		classes = classesToArray( value );
 
+		if ( classes.length ) {
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
 
@@ -9149,13 +9190,14 @@ jQuery.fn.extend( {
 	},
 
 	toggleClass: function( value, stateVal ) {
-		var type = typeof value;
+		var type = typeof value,
+			isValidValue = type === "string" || Array.isArray( value );
 
-		if ( typeof stateVal === "boolean" && type === "string" ) {
+		if ( typeof stateVal === "boolean" && isValidValue ) {
 			return stateVal ? this.addClass( value ) : this.removeClass( value );
 		}
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( isFunction( value ) ) {
 			return this.each( function( i ) {
 				jQuery( this ).toggleClass(
 					value.call( this, i, getClass( this ), stateVal ),
@@ -9167,12 +9209,12 @@ jQuery.fn.extend( {
 		return this.each( function() {
 			var className, i, self, classNames;
 
-			if ( type === "string" ) {
+			if ( isValidValue ) {
 
 				// Toggle individual class names
 				i = 0;
 				self = jQuery( this );
-				classNames = value.match( rnothtmlwhite ) || [];
+				classNames = classesToArray( value );
 
 				while ( ( className = classNames[ i++ ] ) ) {
 
@@ -9231,7 +9273,7 @@ var rreturn = /\r/g;
 
 jQuery.fn.extend( {
 	val: function( value ) {
-		var hooks, ret, isFunction,
+		var hooks, ret, valueIsFunction,
 			elem = this[ 0 ];
 
 		if ( !arguments.length ) {
@@ -9260,7 +9302,7 @@ jQuery.fn.extend( {
 			return;
 		}
 
-		isFunction = jQuery.isFunction( value );
+		valueIsFunction = isFunction( value );
 
 		return this.each( function( i ) {
 			var val;
@@ -9269,7 +9311,7 @@ jQuery.fn.extend( {
 				return;
 			}
 
-			if ( isFunction ) {
+			if ( valueIsFunction ) {
 				val = value.call( this, i, jQuery( this ).val() );
 			} else {
 				val = value;
@@ -9411,18 +9453,24 @@ jQuery.each( [ "radio", "checkbox" ], function() {
 // Return jQuery for attributes-only inclusion
 
 
-var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/;
+support.focusin = "onfocusin" in window;
+
+
+var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
+	stopPropagationCallback = function( e ) {
+		e.stopPropagation();
+	};
 
 jQuery.extend( jQuery.event, {
 
 	trigger: function( event, data, elem, onlyHandlers ) {
 
-		var i, cur, tmp, bubbleType, ontype, handle, special,
+		var i, cur, tmp, bubbleType, ontype, handle, special, lastElement,
 			eventPath = [ elem || document ],
 			type = hasOwn.call( event, "type" ) ? event.type : event,
 			namespaces = hasOwn.call( event, "namespace" ) ? event.namespace.split( "." ) : [];
 
-		cur = tmp = elem = elem || document;
+		cur = lastElement = tmp = elem = elem || document;
 
 		// Don't do events on text and comment nodes
 		if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
@@ -9474,7 +9522,7 @@ jQuery.extend( jQuery.event, {
 
 		// Determine event propagation path in advance, per W3C events spec (#9951)
 		// Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
-		if ( !onlyHandlers && !special.noBubble && !jQuery.isWindow( elem ) ) {
+		if ( !onlyHandlers && !special.noBubble && !isWindow( elem ) ) {
 
 			bubbleType = special.delegateType || type;
 			if ( !rfocusMorph.test( bubbleType + type ) ) {
@@ -9494,7 +9542,7 @@ jQuery.extend( jQuery.event, {
 		// Fire handlers on the event path
 		i = 0;
 		while ( ( cur = eventPath[ i++ ] ) && !event.isPropagationStopped() ) {
-
+			lastElement = cur;
 			event.type = i > 1 ?
 				bubbleType :
 				special.bindType || type;
@@ -9526,7 +9574,7 @@ jQuery.extend( jQuery.event, {
 
 				// Call a native DOM method on the target with the same name as the event.
 				// Don't do default actions on window, that's where global variables be (#6170)
-				if ( ontype && jQuery.isFunction( elem[ type ] ) && !jQuery.isWindow( elem ) ) {
+				if ( ontype && isFunction( elem[ type ] ) && !isWindow( elem ) ) {
 
 					// Don't re-trigger an onFOO event when we call its FOO() method
 					tmp = elem[ ontype ];
@@ -9537,7 +9585,17 @@ jQuery.extend( jQuery.event, {
 
 					// Prevent re-triggering of the same event, since we already bubbled it above
 					jQuery.event.triggered = type;
+
+					if ( event.isPropagationStopped() ) {
+						lastElement.addEventListener( type, stopPropagationCallback );
+					}
+
 					elem[ type ]();
+
+					if ( event.isPropagationStopped() ) {
+						lastElement.removeEventListener( type, stopPropagationCallback );
+					}
+
 					jQuery.event.triggered = undefined;
 
 					if ( tmp ) {
@@ -9583,31 +9641,6 @@ jQuery.fn.extend( {
 } );
 
 
-jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
-	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
-	"change select submit keydown keypress keyup contextmenu" ).split( " " ),
-	function( i, name ) {
-
-	// Handle event binding
-	jQuery.fn[ name ] = function( data, fn ) {
-		return arguments.length > 0 ?
-			this.on( name, null, data, fn ) :
-			this.trigger( name );
-	};
-} );
-
-jQuery.fn.extend( {
-	hover: function( fnOver, fnOut ) {
-		return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
-	}
-} );
-
-
-
-
-support.focusin = "onfocusin" in window;
-
-
 // Support: Firefox <=44
 // Firefox doesn't have focus(in | out) events
 // Related ticket - https://bugzilla.mozilla.org/show_bug.cgi?id=687787
@@ -9651,7 +9684,7 @@ if ( !support.focusin ) {
 }
 var location = window.location;
 
-var nonce = jQuery.now();
+var nonce = Date.now();
 
 var rquery = ( /\?/ );
 
@@ -9709,7 +9742,7 @@ function buildParams( prefix, obj, traditional, add ) {
 			}
 		} );
 
-	} else if ( !traditional && jQuery.type( obj ) === "object" ) {
+	} else if ( !traditional && toType( obj ) === "object" ) {
 
 		// Serialize object item.
 		for ( name in obj ) {
@@ -9731,7 +9764,7 @@ jQuery.param = function( a, traditional ) {
 		add = function( key, valueOrFunction ) {
 
 			// If value is a function, invoke it and use its return value
-			var value = jQuery.isFunction( valueOrFunction ) ?
+			var value = isFunction( valueOrFunction ) ?
 				valueOrFunction() :
 				valueOrFunction;
 
@@ -9849,7 +9882,7 @@ function addToPrefiltersOrTransports( structure ) {
 			i = 0,
 			dataTypes = dataTypeExpression.toLowerCase().match( rnothtmlwhite ) || [];
 
-		if ( jQuery.isFunction( func ) ) {
+		if ( isFunction( func ) ) {
 
 			// For each dataType in the dataTypeExpression
 			while ( ( dataType = dataTypes[ i++ ] ) ) {
@@ -10321,7 +10354,7 @@ jQuery.extend( {
 		if ( s.crossDomain == null ) {
 			urlAnchor = document.createElement( "a" );
 
-			// Support: IE <=8 - 11, Edge 12 - 13
+			// Support: IE <=8 - 11, Edge 12 - 15
 			// IE throws exception on accessing the href property if url is malformed,
 			// e.g. http://example.com:80x/
 			try {
@@ -10379,8 +10412,8 @@ jQuery.extend( {
 			// Remember the hash so we can put it back
 			uncached = s.url.slice( cacheURL.length );
 
-			// If data is available, append data to url
-			if ( s.data ) {
+			// If data is available and should be processed, append data to url
+			if ( s.data && ( s.processData || typeof s.data === "string" ) ) {
 				cacheURL += ( rquery.test( cacheURL ) ? "&" : "?" ) + s.data;
 
 				// #9682: remove data so that it's not used in an eventual retry
@@ -10617,7 +10650,7 @@ jQuery.each( [ "get", "post" ], function( i, method ) {
 	jQuery[ method ] = function( url, data, callback, type ) {
 
 		// Shift arguments if data argument was omitted
-		if ( jQuery.isFunction( data ) ) {
+		if ( isFunction( data ) ) {
 			type = type || callback;
 			callback = data;
 			data = undefined;
@@ -10655,7 +10688,7 @@ jQuery.fn.extend( {
 		var wrap;
 
 		if ( this[ 0 ] ) {
-			if ( jQuery.isFunction( html ) ) {
+			if ( isFunction( html ) ) {
 				html = html.call( this[ 0 ] );
 			}
 
@@ -10681,7 +10714,7 @@ jQuery.fn.extend( {
 	},
 
 	wrapInner: function( html ) {
-		if ( jQuery.isFunction( html ) ) {
+		if ( isFunction( html ) ) {
 			return this.each( function( i ) {
 				jQuery( this ).wrapInner( html.call( this, i ) );
 			} );
@@ -10701,10 +10734,10 @@ jQuery.fn.extend( {
 	},
 
 	wrap: function( html ) {
-		var isFunction = jQuery.isFunction( html );
+		var htmlIsFunction = isFunction( html );
 
 		return this.each( function( i ) {
-			jQuery( this ).wrapAll( isFunction ? html.call( this, i ) : html );
+			jQuery( this ).wrapAll( htmlIsFunction ? html.call( this, i ) : html );
 		} );
 	},
 
@@ -10796,7 +10829,8 @@ jQuery.ajaxTransport( function( options ) {
 					return function() {
 						if ( callback ) {
 							callback = errorCallback = xhr.onload =
-								xhr.onerror = xhr.onabort = xhr.onreadystatechange = null;
+								xhr.onerror = xhr.onabort = xhr.ontimeout =
+									xhr.onreadystatechange = null;
 
 							if ( type === "abort" ) {
 								xhr.abort();
@@ -10836,7 +10870,7 @@ jQuery.ajaxTransport( function( options ) {
 
 				// Listen to events
 				xhr.onload = callback();
-				errorCallback = xhr.onerror = callback( "error" );
+				errorCallback = xhr.onerror = xhr.ontimeout = callback( "error" );
 
 				// Support: IE 9 only
 				// Use onreadystatechange to replace onabort
@@ -10990,7 +11024,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 	if ( jsonProp || s.dataTypes[ 0 ] === "jsonp" ) {
 
 		// Get callback name, remembering preexisting value associated with it
-		callbackName = s.jsonpCallback = jQuery.isFunction( s.jsonpCallback ) ?
+		callbackName = s.jsonpCallback = isFunction( s.jsonpCallback ) ?
 			s.jsonpCallback() :
 			s.jsonpCallback;
 
@@ -11041,7 +11075,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 			}
 
 			// Call if it was a function and we have a response
-			if ( responseContainer && jQuery.isFunction( overwritten ) ) {
+			if ( responseContainer && isFunction( overwritten ) ) {
 				overwritten( responseContainer[ 0 ] );
 			}
 
@@ -11133,7 +11167,7 @@ jQuery.fn.load = function( url, params, callback ) {
 	}
 
 	// If it's a function
-	if ( jQuery.isFunction( params ) ) {
+	if ( isFunction( params ) ) {
 
 		// We assume that it's the callback
 		callback = params;
@@ -11241,7 +11275,7 @@ jQuery.offset = {
 			curLeft = parseFloat( curCSSLeft ) || 0;
 		}
 
-		if ( jQuery.isFunction( options ) ) {
+		if ( isFunction( options ) ) {
 
 			// Use jQuery.extend here to allow modification of coordinates argument (gh-1848)
 			options = options.call( elem, i, jQuery.extend( {}, curOffset ) );
@@ -11264,6 +11298,8 @@ jQuery.offset = {
 };
 
 jQuery.fn.extend( {
+
+	// offset() relates an element's border box to the document origin
 	offset: function( options ) {
 
 		// Preserve chaining for setter
@@ -11275,7 +11311,7 @@ jQuery.fn.extend( {
 				} );
 		}
 
-		var doc, docElem, rect, win,
+		var rect, win,
 			elem = this[ 0 ];
 
 		if ( !elem ) {
@@ -11290,50 +11326,52 @@ jQuery.fn.extend( {
 			return { top: 0, left: 0 };
 		}
 
+		// Get document-relative position by adding viewport scroll to viewport-relative gBCR
 		rect = elem.getBoundingClientRect();
-
-		doc = elem.ownerDocument;
-		docElem = doc.documentElement;
-		win = doc.defaultView;
-
+		win = elem.ownerDocument.defaultView;
 		return {
-			top: rect.top + win.pageYOffset - docElem.clientTop,
-			left: rect.left + win.pageXOffset - docElem.clientLeft
+			top: rect.top + win.pageYOffset,
+			left: rect.left + win.pageXOffset
 		};
 	},
 
+	// position() relates an element's margin box to its offset parent's padding box
+	// This corresponds to the behavior of CSS absolute positioning
 	position: function() {
 		if ( !this[ 0 ] ) {
 			return;
 		}
 
-		var offsetParent, offset,
+		var offsetParent, offset, doc,
 			elem = this[ 0 ],
 			parentOffset = { top: 0, left: 0 };
 
-		// Fixed elements are offset from window (parentOffset = {top:0, left: 0},
-		// because it is its only offset parent
+		// position:fixed elements are offset from the viewport, which itself always has zero offset
 		if ( jQuery.css( elem, "position" ) === "fixed" ) {
 
-			// Assume getBoundingClientRect is there when computed position is fixed
+			// Assume position:fixed implies availability of getBoundingClientRect
 			offset = elem.getBoundingClientRect();
 
 		} else {
-
-			// Get *real* offsetParent
-			offsetParent = this.offsetParent();
-
-			// Get correct offsets
 			offset = this.offset();
-			if ( !nodeName( offsetParent[ 0 ], "html" ) ) {
-				parentOffset = offsetParent.offset();
-			}
 
-			// Add offsetParent borders
-			parentOffset = {
-				top: parentOffset.top + jQuery.css( offsetParent[ 0 ], "borderTopWidth", true ),
-				left: parentOffset.left + jQuery.css( offsetParent[ 0 ], "borderLeftWidth", true )
-			};
+			// Account for the *real* offset parent, which can be the document or its root element
+			// when a statically positioned element is identified
+			doc = elem.ownerDocument;
+			offsetParent = elem.offsetParent || doc.documentElement;
+			while ( offsetParent &&
+				( offsetParent === doc.body || offsetParent === doc.documentElement ) &&
+				jQuery.css( offsetParent, "position" ) === "static" ) {
+
+				offsetParent = offsetParent.parentNode;
+			}
+			if ( offsetParent && offsetParent !== elem && offsetParent.nodeType === 1 ) {
+
+				// Incorporate borders into its offset, since they are outside its content origin
+				parentOffset = jQuery( offsetParent ).offset();
+				parentOffset.top += jQuery.css( offsetParent, "borderTopWidth", true );
+				parentOffset.left += jQuery.css( offsetParent, "borderLeftWidth", true );
+			}
 		}
 
 		// Subtract parent offsets and element margins
@@ -11375,7 +11413,7 @@ jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( 
 
 			// Coalesce documents and windows
 			var win;
-			if ( jQuery.isWindow( elem ) ) {
+			if ( isWindow( elem ) ) {
 				win = elem;
 			} else if ( elem.nodeType === 9 ) {
 				win = elem.defaultView;
@@ -11433,7 +11471,7 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 			return access( this, function( elem, type, value ) {
 				var doc;
 
-				if ( jQuery.isWindow( elem ) ) {
+				if ( isWindow( elem ) ) {
 
 					// $( window ).outerWidth/Height return w/h including scrollbars (gh-1729)
 					return funcName.indexOf( "outer" ) === 0 ?
@@ -11467,6 +11505,28 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 } );
 
 
+jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
+	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+	"change select submit keydown keypress keyup contextmenu" ).split( " " ),
+	function( i, name ) {
+
+	// Handle event binding
+	jQuery.fn[ name ] = function( data, fn ) {
+		return arguments.length > 0 ?
+			this.on( name, null, data, fn ) :
+			this.trigger( name );
+	};
+} );
+
+jQuery.fn.extend( {
+	hover: function( fnOver, fnOut ) {
+		return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
+	}
+} );
+
+
+
+
 jQuery.fn.extend( {
 
 	bind: function( types, data, fn ) {
@@ -11488,6 +11548,37 @@ jQuery.fn.extend( {
 	}
 } );
 
+// Bind a function to a context, optionally partially applying any
+// arguments.
+// jQuery.proxy is deprecated to promote standards (specifically Function#bind)
+// However, it is not slated for removal any time soon
+jQuery.proxy = function( fn, context ) {
+	var tmp, args, proxy;
+
+	if ( typeof context === "string" ) {
+		tmp = fn[ context ];
+		context = fn;
+		fn = tmp;
+	}
+
+	// Quick check to determine if target is callable, in the spec
+	// this throws a TypeError, but we will just return undefined.
+	if ( !isFunction( fn ) ) {
+		return undefined;
+	}
+
+	// Simulated bind
+	args = slice.call( arguments, 2 );
+	proxy = function() {
+		return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
+	};
+
+	// Set the guid of unique handler to the same of original handler, so it can be removed
+	proxy.guid = fn.guid = fn.guid || jQuery.guid++;
+
+	return proxy;
+};
+
 jQuery.holdReady = function( hold ) {
 	if ( hold ) {
 		jQuery.readyWait++;
@@ -11498,6 +11589,26 @@ jQuery.holdReady = function( hold ) {
 jQuery.isArray = Array.isArray;
 jQuery.parseJSON = JSON.parse;
 jQuery.nodeName = nodeName;
+jQuery.isFunction = isFunction;
+jQuery.isWindow = isWindow;
+jQuery.camelCase = camelCase;
+jQuery.type = toType;
+
+jQuery.now = Date.now;
+
+jQuery.isNumeric = function( obj ) {
+
+	// As of jQuery 3.0, isNumeric is limited to
+	// strings and numbers (primitives or objects)
+	// that can be coerced to finite numbers (gh-2662)
+	var type = jQuery.type( obj );
+	return ( type === "number" || type === "string" ) &&
+
+		// parseFloat NaNs numeric-cast false positives ("")
+		// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
+		// subtraction forces infinities to NaN
+		!isNaN( obj - parseFloat( obj ) );
+};
 
 
 
@@ -13946,1617 +14057,5079 @@ if (typeof jQuery === 'undefined') {
 /* 7 */
 /***/ (function(module, exports) {
 
-/*! Copyright (c) 2011 Piotr Rochala (http://rocha.la)
- * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
- *
- * Version: 1.3.8
- *
+/**
+ * Resize function without multiple trigger
+ * 
+ * Usage:
+ * $(window).smartresize(function(){  
+ *     // code here
+ * });
  */
-(function($) {
+(function($,sr){
+    // debouncing function from John Hann
+    // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+    var debounce = function (func, threshold, execAsap) {
+      var timeout;
 
-  $.fn.extend({
-    slimScroll: function(options) {
-
-      var defaults = {
-
-        // width in pixels of the visible scroll area
-        width : 'auto',
-
-        // height in pixels of the visible scroll area
-        height : '250px',
-
-        // width in pixels of the scrollbar and rail
-        size : '7px',
-
-        // scrollbar color, accepts any hex/color value
-        color: '#000',
-
-        // scrollbar position - left/right
-        position : 'right',
-
-        // distance in pixels between the side edge and the scrollbar
-        distance : '1px',
-
-        // default scroll position on load - top / bottom / $('selector')
-        start : 'top',
-
-        // sets scrollbar opacity
-        opacity : .4,
-
-        // enables always-on mode for the scrollbar
-        alwaysVisible : false,
-
-        // check if we should hide the scrollbar when user is hovering over
-        disableFadeOut : false,
-
-        // sets visibility of the rail
-        railVisible : false,
-
-        // sets rail color
-        railColor : '#333',
-
-        // sets rail opacity
-        railOpacity : .2,
-
-        // whether  we should use jQuery UI Draggable to enable bar dragging
-        railDraggable : true,
-
-        // defautlt CSS class of the slimscroll rail
-        railClass : 'slimScrollRail',
-
-        // defautlt CSS class of the slimscroll bar
-        barClass : 'slimScrollBar',
-
-        // defautlt CSS class of the slimscroll wrapper
-        wrapperClass : 'slimScrollDiv',
-
-        // check if mousewheel should scroll the window if we reach top/bottom
-        allowPageScroll : false,
-
-        // scroll amount applied to each mouse wheel step
-        wheelStep : 20,
-
-        // scroll amount applied when user is using gestures
-        touchScrollStep : 200,
-
-        // sets border radius
-        borderRadius: '7px',
-
-        // sets border radius of the rail
-        railBorderRadius : '7px'
-      };
-
-      var o = $.extend(defaults, options);
-
-      // do it for every element that matches selector
-      this.each(function(){
-
-      var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
-        barHeight, percentScroll, lastScroll,
-        divS = '<div></div>',
-        minBarHeight = 30,
-        releaseScroll = false;
-
-        // used in event handlers and for better minification
-        var me = $(this);
-
-        // ensure we are not binding it again
-        if (me.parent().hasClass(o.wrapperClass))
-        {
-            // start from last bar position
-            var offset = me.scrollTop();
-
-            // find bar and rail
-            bar = me.siblings('.' + o.barClass);
-            rail = me.siblings('.' + o.railClass);
-
-            getBarHeight();
-
-            // check if we should scroll existing instance
-            if ($.isPlainObject(options))
-            {
-              // Pass height: auto to an existing slimscroll object to force a resize after contents have changed
-              if ( 'height' in options && options.height == 'auto' ) {
-                me.parent().css('height', 'auto');
-                me.css('height', 'auto');
-                var height = me.parent().parent().height();
-                me.parent().css('height', height);
-                me.css('height', height);
-              } else if ('height' in options) {
-                var h = options.height;
-                me.parent().css('height', h);
-                me.css('height', h);
-              }
-
-              if ('scrollTo' in options)
-              {
-                // jump to a static point
-                offset = parseInt(o.scrollTo);
-              }
-              else if ('scrollBy' in options)
-              {
-                // jump by value pixels
-                offset += parseInt(o.scrollBy);
-              }
-              else if ('destroy' in options)
-              {
-                // remove slimscroll elements
-                bar.remove();
-                rail.remove();
-                me.unwrap();
-                return;
-              }
-
-              // scroll content by the given offset
-              scrollContent(offset, false, true);
+        return function debounced () {
+            var obj = this, args = arguments;
+            function delayed () {
+                if (!execAsap)
+                    func.apply(obj, args); 
+                timeout = null; 
             }
 
-            return;
-        }
-        else if ($.isPlainObject(options))
-        {
-            if ('destroy' in options)
+            if (timeout)
+                clearTimeout(timeout);
+            else if (execAsap)
+                func.apply(obj, args);
+
+            timeout = setTimeout(delayed, threshold || 100); 
+        };
+    };
+
+    // smartresize 
+    jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
+
+})(jQuery,'smartresize');
+/**
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
+    $BODY = $('body'),
+    $MENU_TOGGLE = $('#menu_toggle'),
+    $SIDEBAR_MENU = $('#sidebar-menu'),
+    $SIDEBAR_FOOTER = $('.sidebar-footer'),
+    $LEFT_COL = $('.left_col'),
+    $RIGHT_COL = $('.right_col'),
+    $NAV_MENU = $('.nav_menu'),
+    $FOOTER = $('footer');
+
+	
+	
+// Sidebar
+function init_sidebar() {
+// TODO: This is some kind of easy fix, maybe we can improve this
+var setContentHeight = function () {
+	// reset height
+	$RIGHT_COL.css('min-height', $(window).height());
+
+	var bodyHeight = $BODY.outerHeight(),
+		footerHeight = $BODY.hasClass('footer_fixed') ? -10 : $FOOTER.height(),
+		leftColHeight = $LEFT_COL.eq(1).height() + $SIDEBAR_FOOTER.height(),
+		contentHeight = bodyHeight < leftColHeight ? leftColHeight : bodyHeight;
+
+	// normalize content
+	contentHeight -= $NAV_MENU.height() + footerHeight;
+
+	$RIGHT_COL.css('min-height', contentHeight);
+};
+
+  $SIDEBAR_MENU.find('a').on('click', function(ev) {
+	  console.log('clicked - sidebar_menu');
+        var $li = $(this).parent();
+
+        if ($li.is('.active')) {
+            $li.removeClass('active active-sm');
+            $('ul:first', $li).slideUp(function() {
+                setContentHeight();
+            });
+        } else {
+            // prevent closing menu if we are on child menu
+            if (!$li.parent().is('.child_menu')) {
+                $SIDEBAR_MENU.find('li').removeClass('active active-sm');
+                $SIDEBAR_MENU.find('li ul').slideUp();
+            }else
             {
-            	return;
-            }
+				if ( $BODY.is( ".nav-sm" ) )
+				{
+					$SIDEBAR_MENU.find( "li" ).removeClass( "active active-sm" );
+					$SIDEBAR_MENU.find( "li ul" ).slideUp();
+				}
+			}
+            $li.addClass('active');
+
+            $('ul:first', $li).slideDown(function() {
+                setContentHeight();
+            });
+        }
+    });
+
+// toggle small or large menu 
+$MENU_TOGGLE.on('click', function() {
+		console.log('clicked - menu toggle');
+		
+		if ($BODY.hasClass('nav-md')) {
+			$SIDEBAR_MENU.find('li.active ul').hide();
+			$SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
+		} else {
+			$SIDEBAR_MENU.find('li.active-sm ul').show();
+			$SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
+		}
+
+	$BODY.toggleClass('nav-md nav-sm');
+
+	setContentHeight();
+
+	$('.dataTable').each ( function () { $(this).dataTable().fnDraw(); });
+});
+
+	// check active menu
+	$SIDEBAR_MENU.find('a[href="' + CURRENT_URL + '"]').parent('li').addClass('current-page');
+
+	$SIDEBAR_MENU.find('a').filter(function () {
+		return this.href == CURRENT_URL;
+	}).parent('li').addClass('current-page').parents('ul').slideDown(function() {
+		setContentHeight();
+	}).parent().addClass('active');
+
+	// recompute content when resizing
+	$(window).smartresize(function(){  
+		setContentHeight();
+	});
+
+	setContentHeight();
+
+	// fixed sidebar
+	if ($.fn.mCustomScrollbar) {
+		$('.menu_fixed').mCustomScrollbar({
+			autoHideScrollbar: true,
+			theme: 'minimal',
+			mouseWheel:{ preventDefault: true }
+		});
+	}
+};
+// /Sidebar
+
+	var randNum = function() {
+	  return (Math.floor(Math.random() * (1 + 40 - 20))) + 20;
+	};
+
+
+// Panel toolbox
+$(document).ready(function() {
+    $('.collapse-link').on('click', function() {
+        var $BOX_PANEL = $(this).closest('.x_panel'),
+            $ICON = $(this).find('i'),
+            $BOX_CONTENT = $BOX_PANEL.find('.x_content');
+        
+        // fix for some div with hardcoded fix class
+        if ($BOX_PANEL.attr('style')) {
+            $BOX_CONTENT.slideToggle(200, function(){
+                $BOX_PANEL.removeAttr('style');
+            });
+        } else {
+            $BOX_CONTENT.slideToggle(200); 
+            $BOX_PANEL.css('height', 'auto');  
         }
 
-        // optionally set height to the parent's height
-        o.height = (o.height == 'auto') ? me.parent().height() : o.height;
+        $ICON.toggleClass('fa-chevron-up fa-chevron-down');
+    });
 
-        // wrap content
-        var wrapper = $(divS)
-          .addClass(o.wrapperClass)
-          .css({
-            position: 'relative',
-            overflow: 'hidden',
-            width: o.width,
-            height: o.height
-          });
+    $('.close-link').click(function () {
+        var $BOX_PANEL = $(this).closest('.x_panel');
 
-        // update style for the div
-        me.css({
-          overflow: 'hidden',
-          width: o.width,
-          height: o.height
+        $BOX_PANEL.remove();
+    });
+});
+// /Panel toolbox
+
+// Tooltip
+$(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip({
+        container: 'body'
+    });
+});
+// /Tooltip
+
+// Progressbar
+if ($(".progress .progress-bar")[0]) {
+    $('.progress .progress-bar').progressbar();
+}
+// /Progressbar
+
+// Switchery
+$(document).ready(function() {
+    if ($(".js-switch")[0]) {
+        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+        elems.forEach(function (html) {
+            var switchery = new Switchery(html, {
+                color: '#26B99A'
+            });
+        });
+    }
+});
+// /Switchery
+
+
+// iCheck
+$(document).ready(function() {
+    if ($("input.flat")[0]) {
+        $(document).ready(function () {
+            $('input.flat').iCheck({
+                checkboxClass: 'icheckbox_flat-green',
+                radioClass: 'iradio_flat-green'
+            });
+        });
+    }
+});
+// /iCheck
+
+// Table
+$('table input').on('ifChecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().addClass('selected');
+    countChecked();
+});
+$('table input').on('ifUnchecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().removeClass('selected');
+    countChecked();
+});
+
+var checkState = '';
+
+$('.bulk_action input').on('ifChecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().addClass('selected');
+    countChecked();
+});
+$('.bulk_action input').on('ifUnchecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().removeClass('selected');
+    countChecked();
+});
+$('.bulk_action input#check-all').on('ifChecked', function () {
+    checkState = 'all';
+    countChecked();
+});
+$('.bulk_action input#check-all').on('ifUnchecked', function () {
+    checkState = 'none';
+    countChecked();
+});
+
+function countChecked() {
+    if (checkState === 'all') {
+        $(".bulk_action input[name='table_records']").iCheck('check');
+    }
+    if (checkState === 'none') {
+        $(".bulk_action input[name='table_records']").iCheck('uncheck');
+    }
+
+    var checkCount = $(".bulk_action input[name='table_records']:checked").length;
+
+    if (checkCount) {
+        $('.column-title').hide();
+        $('.bulk-actions').show();
+        $('.action-cnt').html(checkCount + ' Records Selected');
+    } else {
+        $('.column-title').show();
+        $('.bulk-actions').hide();
+    }
+}
+
+
+
+// Accordion
+$(document).ready(function() {
+    $(".expand").on("click", function () {
+        $(this).next().slideToggle(200);
+        $expand = $(this).find(">:first-child");
+
+        if ($expand.text() == "+") {
+            $expand.text("-");
+        } else {
+            $expand.text("+");
+        }
+    });
+});
+
+// NProgress
+if (typeof NProgress != 'undefined') {
+    $(document).ready(function () {
+        NProgress.start();
+    });
+
+    $(window).load(function () {
+        NProgress.done();
+    });
+}
+
+	
+	  //hover and retain popover when on popover content
+        var originalLeave = $.fn.popover.Constructor.prototype.leave;
+        $.fn.popover.Constructor.prototype.leave = function(obj) {
+          var self = obj instanceof this.constructor ?
+            obj : $(obj.currentTarget)[this.type](this.getDelegateOptions()).data('bs.' + this.type);
+          var container, timeout;
+
+          originalLeave.call(this, obj);
+
+          if (obj.currentTarget) {
+            container = $(obj.currentTarget).siblings('.popover');
+            timeout = self.timeout;
+            container.one('mouseenter', function() {
+              //We entered the actual popover – call off the dogs
+              clearTimeout(timeout);
+              //Let's monitor popover content instead
+              container.one('mouseleave', function() {
+                $.fn.popover.Constructor.prototype.leave.call(self, self);
+              });
+            });
+          }
+        };
+
+        $('body').popover({
+          selector: '[data-popover]',
+          trigger: 'click hover',
+          delay: {
+            show: 50,
+            hide: 400
+          }
         });
 
-        // create scrollbar rail
-        var rail = $(divS)
-          .addClass(o.railClass)
-          .css({
-            width: o.size,
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
-            'border-radius': o.railBorderRadius,
-            background: o.railColor,
-            opacity: o.railOpacity,
-            zIndex: 90
+
+	function gd(year, month, day) {
+		return new Date(year, month - 1, day).getTime();
+	}
+	  
+	
+	function init_flot_chart(){
+		
+		if( typeof ($.plot) === 'undefined'){ return; }
+		
+		console.log('init_flot_chart');
+		
+		
+		
+		var arr_data1 = [
+			[gd(2012, 1, 1), 17],
+			[gd(2012, 1, 2), 74],
+			[gd(2012, 1, 3), 6],
+			[gd(2012, 1, 4), 39],
+			[gd(2012, 1, 5), 20],
+			[gd(2012, 1, 6), 85],
+			[gd(2012, 1, 7), 7]
+		];
+
+		var arr_data2 = [
+		  [gd(2012, 1, 1), 82],
+		  [gd(2012, 1, 2), 23],
+		  [gd(2012, 1, 3), 66],
+		  [gd(2012, 1, 4), 9],
+		  [gd(2012, 1, 5), 119],
+		  [gd(2012, 1, 6), 6],
+		  [gd(2012, 1, 7), 9]
+		];
+		
+		var arr_data3 = [
+			[0, 1],
+			[1, 9],
+			[2, 6],
+			[3, 10],
+			[4, 5],
+			[5, 17],
+			[6, 6],
+			[7, 10],
+			[8, 7],
+			[9, 11],
+			[10, 35],
+			[11, 9],
+			[12, 12],
+			[13, 5],
+			[14, 3],
+			[15, 4],
+			[16, 9]
+		];
+		
+		var chart_plot_02_data = [];
+		
+		var chart_plot_03_data = [
+			[0, 1],
+			[1, 9],
+			[2, 6],
+			[3, 10],
+			[4, 5],
+			[5, 17],
+			[6, 6],
+			[7, 10],
+			[8, 7],
+			[9, 11],
+			[10, 35],
+			[11, 9],
+			[12, 12],
+			[13, 5],
+			[14, 3],
+			[15, 4],
+			[16, 9]
+		];
+		
+		
+		for (var i = 0; i < 30; i++) {
+		  chart_plot_02_data.push([new Date(Date.today().add(i).days()).getTime(), randNum() + i + i + 10]);
+		}
+		
+		
+		var chart_plot_01_settings = {
+          series: {
+            lines: {
+              show: false,
+              fill: true
+            },
+            splines: {
+              show: true,
+              tension: 0.4,
+              lineWidth: 1,
+              fill: 0.4
+            },
+            points: {
+              radius: 0,
+              show: true
+            },
+            shadowSize: 2
+          },
+          grid: {
+            verticalLines: true,
+            hoverable: true,
+            clickable: true,
+            tickColor: "#d5d5d5",
+            borderWidth: 1,
+            color: '#fff'
+          },
+          colors: ["rgba(38, 185, 154, 0.38)", "rgba(3, 88, 106, 0.38)"],
+          xaxis: {
+            tickColor: "rgba(51, 51, 51, 0.06)",
+            mode: "time",
+            tickSize: [1, "day"],
+            //tickLength: 10,
+            axisLabel: "Date",
+            axisLabelUseCanvas: true,
+            axisLabelFontSizePixels: 12,
+            axisLabelFontFamily: 'Verdana, Arial',
+            axisLabelPadding: 10
+          },
+          yaxis: {
+            ticks: 8,
+            tickColor: "rgba(51, 51, 51, 0.06)",
+          },
+          tooltip: false
+        }
+		
+		var chart_plot_02_settings = {
+			grid: {
+				show: true,
+				aboveData: true,
+				color: "#3f3f3f",
+				labelMargin: 10,
+				axisMargin: 0,
+				borderWidth: 0,
+				borderColor: null,
+				minBorderMargin: 5,
+				clickable: true,
+				hoverable: true,
+				autoHighlight: true,
+				mouseActiveRadius: 100
+			},
+			series: {
+				lines: {
+					show: true,
+					fill: true,
+					lineWidth: 2,
+					steps: false
+				},
+				points: {
+					show: true,
+					radius: 4.5,
+					symbol: "circle",
+					lineWidth: 3.0
+				}
+			},
+			legend: {
+				position: "ne",
+				margin: [0, -25],
+				noColumns: 0,
+				labelBoxBorderColor: null,
+				labelFormatter: function(label, series) {
+					return label + '&nbsp;&nbsp;';
+				},
+				width: 40,
+				height: 1
+			},
+			colors: ['#96CA59', '#3F97EB', '#72c380', '#6f7a8a', '#f7cb38', '#5a8022', '#2c7282'],
+			shadowSize: 0,
+			tooltip: true,
+			tooltipOpts: {
+				content: "%s: %y.0",
+				xDateFormat: "%d/%m",
+			shifts: {
+				x: -30,
+				y: -50
+			},
+			defaultTheme: false
+			},
+			yaxis: {
+				min: 0
+			},
+			xaxis: {
+				mode: "time",
+				minTickSize: [1, "day"],
+				timeformat: "%d/%m/%y",
+				min: chart_plot_02_data[0][0],
+				max: chart_plot_02_data[20][0]
+			}
+		};	
+	
+		var chart_plot_03_settings = {
+			series: {
+				curvedLines: {
+					apply: true,
+					active: true,
+					monotonicFit: true
+				}
+			},
+			colors: ["#26B99A"],
+			grid: {
+				borderWidth: {
+					top: 0,
+					right: 0,
+					bottom: 1,
+					left: 1
+				},
+				borderColor: {
+					bottom: "#7F8790",
+					left: "#7F8790"
+				}
+			}
+		};
+        
+		
+        if ($("#chart_plot_01").length){
+			console.log('Plot1');
+			
+			$.plot( $("#chart_plot_01"), [ arr_data1, arr_data2 ],  chart_plot_01_settings );
+		}
+		
+		
+		if ($("#chart_plot_02").length){
+			console.log('Plot2');
+			
+			$.plot( $("#chart_plot_02"), 
+			[{ 
+				label: "Email Sent", 
+				data: chart_plot_02_data, 
+				lines: { 
+					fillColor: "rgba(150, 202, 89, 0.12)" 
+				}, 
+				points: { 
+					fillColor: "#fff" } 
+			}], chart_plot_02_settings);
+			
+		}
+		
+		if ($("#chart_plot_03").length){
+			console.log('Plot3');
+			
+			
+			$.plot($("#chart_plot_03"), [{
+				label: "Registrations",
+				data: chart_plot_03_data,
+				lines: {
+					fillColor: "rgba(150, 202, 89, 0.12)"
+				}, 
+				points: {
+					fillColor: "#fff"
+				}
+			}], chart_plot_03_settings);
+			
+		};
+	  
+	} 
+	
+		
+	/* STARRR */
+			
+	function init_starrr() {
+		
+		if( typeof (starrr) === 'undefined'){ return; }
+		console.log('init_starrr');
+		
+		$(".stars").starrr();
+
+		$('.stars-existing').starrr({
+		  rating: 4
+		});
+
+		$('.stars').on('starrr:change', function (e, value) {
+		  $('.stars-count').html(value);
+		});
+
+		$('.stars-existing').on('starrr:change', function (e, value) {
+		  $('.stars-count-existing').html(value);
+		});
+		
+	  };
+	
+	
+	function init_JQVmap(){
+
+		//console.log('check init_JQVmap [' + typeof (VectorCanvas) + '][' + typeof (jQuery.fn.vectorMap) + ']' );	
+		
+		if(typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
+		
+		console.log('init_JQVmap');
+	     
+			if ($('#world-map-gdp').length ){
+		 
+				$('#world-map-gdp').vectorMap({
+					map: 'world_en',
+					backgroundColor: null,
+					color: '#ffffff',
+					hoverOpacity: 0.7,
+					selectedColor: '#666666',
+					enableZoom: true,
+					showTooltip: true,
+					values: sample_data,
+					scaleColors: ['#E6F2F0', '#149B7E'],
+					normalizeFunction: 'polynomial'
+				});
+			
+			}
+			
+			if ($('#usa_map').length ){
+			
+				$('#usa_map').vectorMap({
+					map: 'usa_en',
+					backgroundColor: null,
+					color: '#ffffff',
+					hoverOpacity: 0.7,
+					selectedColor: '#666666',
+					enableZoom: true,
+					showTooltip: true,
+					values: sample_data,
+					scaleColors: ['#E6F2F0', '#149B7E'],
+					normalizeFunction: 'polynomial'
+				});
+			
+			}
+			
+	};
+			
+	    
+	function init_skycons(){
+				
+			if( typeof (Skycons) === 'undefined'){ return; }
+			console.log('init_skycons');
+		
+			var icons = new Skycons({
+				"color": "#73879C"
+			  }),
+			  list = [
+				"clear-day", "clear-night", "partly-cloudy-day",
+				"partly-cloudy-night", "cloudy", "rain", "sleet", "snow", "wind",
+				"fog"
+			  ],
+			  i;
+
+			for (i = list.length; i--;)
+			  icons.set(list[i], list[i]);
+
+			icons.play();
+	
+	}  
+	   
+	   
+	function init_chart_doughnut(){
+				
+		if( typeof (Chart) === 'undefined'){ return; }
+		
+		console.log('init_chart_doughnut');
+	 
+		if ($('.canvasDoughnut').length){
+			
+		var chart_doughnut_settings = {
+				type: 'doughnut',
+				tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+				data: {
+					labels: [
+						"Symbian",
+						"Blackberry",
+						"Other",
+						"Android",
+						"IOS"
+					],
+					datasets: [{
+						data: [15, 20, 30, 10, 30],
+						backgroundColor: [
+							"#BDC3C7",
+							"#9B59B6",
+							"#E74C3C",
+							"#26B99A",
+							"#3498DB"
+						],
+						hoverBackgroundColor: [
+							"#CFD4D8",
+							"#B370CF",
+							"#E95E4F",
+							"#36CAAB",
+							"#49A9EA"
+						]
+					}]
+				},
+				options: { 
+					legend: false, 
+					responsive: false 
+				}
+			}
+		
+			$('.canvasDoughnut').each(function(){
+				
+				var chart_element = $(this);
+				var chart_doughnut = new Chart( chart_element, chart_doughnut_settings);
+				
+			});			
+		
+		}  
+	   
+	}
+	   
+	function init_gauge() {
+			
+		if( typeof (Gauge) === 'undefined'){ return; }
+		
+		console.log('init_gauge [' + $('.gauge-chart').length + ']');
+		
+		console.log('init_gauge');
+		
+
+		  var chart_gauge_settings = {
+		  lines: 12,
+		  angle: 0,
+		  lineWidth: 0.4,
+		  pointer: {
+			  length: 0.75,
+			  strokeWidth: 0.042,
+			  color: '#1D212A'
+		  },
+		  limitMax: 'false',
+		  colorStart: '#1ABC9C',
+		  colorStop: '#1ABC9C',
+		  strokeColor: '#F0F3F3',
+		  generateGradient: true
+	  };
+		
+		
+		if ($('#chart_gauge_01').length){ 
+		
+			var chart_gauge_01_elem = document.getElementById('chart_gauge_01');
+			var chart_gauge_01 = new Gauge(chart_gauge_01_elem).setOptions(chart_gauge_settings);
+			
+		}	
+		
+		
+		if ($('#gauge-text').length){ 
+		
+			chart_gauge_01.maxValue = 6000;
+			chart_gauge_01.animationSpeed = 32;
+			chart_gauge_01.set(3200);
+			chart_gauge_01.setTextField(document.getElementById("gauge-text"));
+		
+		}
+		
+		if ($('#chart_gauge_02').length){
+		
+			var chart_gauge_02_elem = document.getElementById('chart_gauge_02');
+			var chart_gauge_02 = new Gauge(chart_gauge_02_elem).setOptions(chart_gauge_settings);
+			
+		}
+		
+		
+		if ($('#gauge-text2').length){
+			
+			chart_gauge_02.maxValue = 9000;
+			chart_gauge_02.animationSpeed = 32;
+			chart_gauge_02.set(2400);
+			chart_gauge_02.setTextField(document.getElementById("gauge-text2"));
+		
+		}
+	
+	
+	}   
+	   	   
+	/* SPARKLINES */
+			
+		function init_sparklines() {
+			
+			if(typeof (jQuery.fn.sparkline) === 'undefined'){ return; }
+			console.log('init_sparklines'); 
+			
+			
+			$(".sparkline_one").sparkline([2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 5, 6, 4, 5, 6, 3, 5, 4, 5, 4, 5, 4, 3, 4, 5, 6, 7, 5, 4, 3, 5, 6], {
+				type: 'bar',
+				height: '125',
+				barWidth: 13,
+				colorMap: {
+					'7': '#a1a1a1'
+				},
+				barSpacing: 2,
+				barColor: '#26B99A'
+			});
+			
+			
+			$(".sparkline_two").sparkline([2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 5, 6, 7, 5, 4, 3, 5, 6], {
+				type: 'bar',
+				height: '40',
+				barWidth: 9,
+				colorMap: {
+					'7': '#a1a1a1'	
+				},
+				barSpacing: 2,
+				barColor: '#26B99A'
+			});
+			
+			
+			$(".sparkline_three").sparkline([2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 5, 6, 7, 5, 4, 3, 5, 6], {
+				type: 'line',
+				width: '200',
+				height: '40',
+				lineColor: '#26B99A',
+				fillColor: 'rgba(223, 223, 223, 0.57)',
+				lineWidth: 2,
+				spotColor: '#26B99A',
+				minSpotColor: '#26B99A'
+			});
+			
+			
+			$(".sparkline11").sparkline([2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 6, 2, 4, 3, 4, 5, 4, 5, 4, 3], {
+				type: 'bar',
+				height: '40',
+				barWidth: 8,
+				colorMap: {
+					'7': '#a1a1a1'
+				},
+				barSpacing: 2,
+				barColor: '#26B99A'
+			});
+			
+			
+			$(".sparkline22").sparkline([2, 4, 3, 4, 7, 5, 4, 3, 5, 6, 2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 6], {
+				type: 'line',
+				height: '40',
+				width: '200',
+				lineColor: '#26B99A',
+				fillColor: '#ffffff',
+				lineWidth: 3,
+				spotColor: '#34495E',
+				minSpotColor: '#34495E'
+			});
+	
+	
+			$(".sparkline_bar").sparkline([2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 5, 6, 4, 5, 6, 3, 5], {
+				type: 'bar',
+				colorMap: {
+					'7': '#a1a1a1'
+				},
+				barColor: '#26B99A'
+			});
+			
+			
+			$(".sparkline_area").sparkline([5, 6, 7, 9, 9, 5, 3, 2, 2, 4, 6, 7], {
+				type: 'line',
+				lineColor: '#26B99A',
+				fillColor: '#26B99A',
+				spotColor: '#4578a0',
+				minSpotColor: '#728fb2',
+				maxSpotColor: '#6d93c4',
+				highlightSpotColor: '#ef5179',
+				highlightLineColor: '#8ba8bf',
+				spotRadius: 2.5,
+				width: 85
+			});
+			
+			
+			$(".sparkline_line").sparkline([2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 5, 6, 4, 5, 6, 3, 5], {
+				type: 'line',
+				lineColor: '#26B99A',
+				fillColor: '#ffffff',
+				width: 85,
+				spotColor: '#34495E',
+				minSpotColor: '#34495E'
+			});
+			
+			
+			$(".sparkline_pie").sparkline([1, 1, 2, 1], {
+				type: 'pie',
+				sliceColors: ['#26B99A', '#ccc', '#75BCDD', '#D66DE2']
+			});
+			
+			
+			$(".sparkline_discreet").sparkline([4, 6, 7, 7, 4, 3, 2, 1, 4, 4, 2, 4, 3, 7, 8, 9, 7, 6, 4, 3], {
+				type: 'discrete',
+				barWidth: 3,
+				lineColor: '#26B99A',
+				width: '85',
+			});
+
+			
+		};   
+	   
+	   
+	   /* AUTOCOMPLETE */
+			
+		function init_autocomplete() {
+			
+			if( typeof (autocomplete) === 'undefined'){ return; }
+			console.log('init_autocomplete');
+			
+			var countries = { AD:"Andorra",A2:"Andorra Test",AE:"United Arab Emirates",AF:"Afghanistan",AG:"Antigua and Barbuda",AI:"Anguilla",AL:"Albania",AM:"Armenia",AN:"Netherlands Antilles",AO:"Angola",AQ:"Antarctica",AR:"Argentina",AS:"American Samoa",AT:"Austria",AU:"Australia",AW:"Aruba",AX:"Åland Islands",AZ:"Azerbaijan",BA:"Bosnia and Herzegovina",BB:"Barbados",BD:"Bangladesh",BE:"Belgium",BF:"Burkina Faso",BG:"Bulgaria",BH:"Bahrain",BI:"Burundi",BJ:"Benin",BL:"Saint Barthélemy",BM:"Bermuda",BN:"Brunei",BO:"Bolivia",BQ:"British Antarctic Territory",BR:"Brazil",BS:"Bahamas",BT:"Bhutan",BV:"Bouvet Island",BW:"Botswana",BY:"Belarus",BZ:"Belize",CA:"Canada",CC:"Cocos [Keeling] Islands",CD:"Congo - Kinshasa",CF:"Central African Republic",CG:"Congo - Brazzaville",CH:"Switzerland",CI:"Côte d’Ivoire",CK:"Cook Islands",CL:"Chile",CM:"Cameroon",CN:"China",CO:"Colombia",CR:"Costa Rica",CS:"Serbia and Montenegro",CT:"Canton and Enderbury Islands",CU:"Cuba",CV:"Cape Verde",CX:"Christmas Island",CY:"Cyprus",CZ:"Czech Republic",DD:"East Germany",DE:"Germany",DJ:"Djibouti",DK:"Denmark",DM:"Dominica",DO:"Dominican Republic",DZ:"Algeria",EC:"Ecuador",EE:"Estonia",EG:"Egypt",EH:"Western Sahara",ER:"Eritrea",ES:"Spain",ET:"Ethiopia",FI:"Finland",FJ:"Fiji",FK:"Falkland Islands",FM:"Micronesia",FO:"Faroe Islands",FQ:"French Southern and Antarctic Territories",FR:"France",FX:"Metropolitan France",GA:"Gabon",GB:"United Kingdom",GD:"Grenada",GE:"Georgia",GF:"French Guiana",GG:"Guernsey",GH:"Ghana",GI:"Gibraltar",GL:"Greenland",GM:"Gambia",GN:"Guinea",GP:"Guadeloupe",GQ:"Equatorial Guinea",GR:"Greece",GS:"South Georgia and the South Sandwich Islands",GT:"Guatemala",GU:"Guam",GW:"Guinea-Bissau",GY:"Guyana",HK:"Hong Kong SAR China",HM:"Heard Island and McDonald Islands",HN:"Honduras",HR:"Croatia",HT:"Haiti",HU:"Hungary",ID:"Indonesia",IE:"Ireland",IL:"Israel",IM:"Isle of Man",IN:"India",IO:"British Indian Ocean Territory",IQ:"Iraq",IR:"Iran",IS:"Iceland",IT:"Italy",JE:"Jersey",JM:"Jamaica",JO:"Jordan",JP:"Japan",JT:"Johnston Island",KE:"Kenya",KG:"Kyrgyzstan",KH:"Cambodia",KI:"Kiribati",KM:"Comoros",KN:"Saint Kitts and Nevis",KP:"North Korea",KR:"South Korea",KW:"Kuwait",KY:"Cayman Islands",KZ:"Kazakhstan",LA:"Laos",LB:"Lebanon",LC:"Saint Lucia",LI:"Liechtenstein",LK:"Sri Lanka",LR:"Liberia",LS:"Lesotho",LT:"Lithuania",LU:"Luxembourg",LV:"Latvia",LY:"Libya",MA:"Morocco",MC:"Monaco",MD:"Moldova",ME:"Montenegro",MF:"Saint Martin",MG:"Madagascar",MH:"Marshall Islands",MI:"Midway Islands",MK:"Macedonia",ML:"Mali",MM:"Myanmar [Burma]",MN:"Mongolia",MO:"Macau SAR China",MP:"Northern Mariana Islands",MQ:"Martinique",MR:"Mauritania",MS:"Montserrat",MT:"Malta",MU:"Mauritius",MV:"Maldives",MW:"Malawi",MX:"Mexico",MY:"Malaysia",MZ:"Mozambique",NA:"Namibia",NC:"New Caledonia",NE:"Niger",NF:"Norfolk Island",NG:"Nigeria",NI:"Nicaragua",NL:"Netherlands",NO:"Norway",NP:"Nepal",NQ:"Dronning Maud Land",NR:"Nauru",NT:"Neutral Zone",NU:"Niue",NZ:"New Zealand",OM:"Oman",PA:"Panama",PC:"Pacific Islands Trust Territory",PE:"Peru",PF:"French Polynesia",PG:"Papua New Guinea",PH:"Philippines",PK:"Pakistan",PL:"Poland",PM:"Saint Pierre and Miquelon",PN:"Pitcairn Islands",PR:"Puerto Rico",PS:"Palestinian Territories",PT:"Portugal",PU:"U.S. Miscellaneous Pacific Islands",PW:"Palau",PY:"Paraguay",PZ:"Panama Canal Zone",QA:"Qatar",RE:"Réunion",RO:"Romania",RS:"Serbia",RU:"Russia",RW:"Rwanda",SA:"Saudi Arabia",SB:"Solomon Islands",SC:"Seychelles",SD:"Sudan",SE:"Sweden",SG:"Singapore",SH:"Saint Helena",SI:"Slovenia",SJ:"Svalbard and Jan Mayen",SK:"Slovakia",SL:"Sierra Leone",SM:"San Marino",SN:"Senegal",SO:"Somalia",SR:"Suriname",ST:"São Tomé and Príncipe",SU:"Union of Soviet Socialist Republics",SV:"El Salvador",SY:"Syria",SZ:"Swaziland",TC:"Turks and Caicos Islands",TD:"Chad",TF:"French Southern Territories",TG:"Togo",TH:"Thailand",TJ:"Tajikistan",TK:"Tokelau",TL:"Timor-Leste",TM:"Turkmenistan",TN:"Tunisia",TO:"Tonga",TR:"Turkey",TT:"Trinidad and Tobago",TV:"Tuvalu",TW:"Taiwan",TZ:"Tanzania",UA:"Ukraine",UG:"Uganda",UM:"U.S. Minor Outlying Islands",US:"United States",UY:"Uruguay",UZ:"Uzbekistan",VA:"Vatican City",VC:"Saint Vincent and the Grenadines",VD:"North Vietnam",VE:"Venezuela",VG:"British Virgin Islands",VI:"U.S. Virgin Islands",VN:"Vietnam",VU:"Vanuatu",WF:"Wallis and Futuna",WK:"Wake Island",WS:"Samoa",YD:"People's Democratic Republic of Yemen",YE:"Yemen",YT:"Mayotte",ZA:"South Africa",ZM:"Zambia",ZW:"Zimbabwe",ZZ:"Unknown or Invalid Region" };
+
+			var countriesArray = $.map(countries, function(value, key) {
+			  return {
+				value: value,
+				data: key
+			  };
+			});
+
+			// initialize autocomplete with custom appendTo
+			$('#autocomplete-custom-append').autocomplete({
+			  lookup: countriesArray
+			});
+			
+		};
+	   
+	 /* AUTOSIZE */
+			
+		function init_autosize() {
+			
+			if(typeof $.fn.autosize !== 'undefined'){
+			
+			autosize($('.resizable_textarea'));
+			
+			}
+			
+		};  
+	   
+	   /* PARSLEY */
+			
+		function init_parsley() {
+			
+			if( typeof (parsley) === 'undefined'){ return; }
+			console.log('init_parsley');
+			
+			$/*.listen*/('parsley:field:validate', function() {
+			  validateFront();
+			});
+			$('#demo-form .btn').on('click', function() {
+			  $('#demo-form').parsley().validate();
+			  validateFront();
+			});
+			var validateFront = function() {
+			  if (true === $('#demo-form').parsley().isValid()) {
+				$('.bs-callout-info').removeClass('hidden');
+				$('.bs-callout-warning').addClass('hidden');
+			  } else {
+				$('.bs-callout-info').addClass('hidden');
+				$('.bs-callout-warning').removeClass('hidden');
+			  }
+			};
+		  
+			$/*.listen*/('parsley:field:validate', function() {
+			  validateFront();
+			});
+			$('#demo-form2 .btn').on('click', function() {
+			  $('#demo-form2').parsley().validate();
+			  validateFront();
+			});
+			var validateFront = function() {
+			  if (true === $('#demo-form2').parsley().isValid()) {
+				$('.bs-callout-info').removeClass('hidden');
+				$('.bs-callout-warning').addClass('hidden');
+			  } else {
+				$('.bs-callout-info').addClass('hidden');
+				$('.bs-callout-warning').removeClass('hidden');
+			  }
+			};
+			
+			  try {
+				hljs.initHighlightingOnLoad();
+			  } catch (err) {}
+			
+		};
+	   
+		
+		  /* INPUTS */
+		  
+			function onAddTag(tag) {
+				alert("Added a tag: " + tag);
+			  }
+
+			  function onRemoveTag(tag) {
+				alert("Removed a tag: " + tag);
+			  }
+
+			  function onChangeTag(input, tag) {
+				alert("Changed a tag: " + tag);
+			  }
+
+			  //tags input
+			function init_TagsInput() {
+				  
+				if(typeof $.fn.tagsInput !== 'undefined'){	
+				 
+				$('#tags_1').tagsInput({
+				  width: 'auto'
+				});
+				
+				}
+				
+		    };
+	   
+		/* SELECT2 */
+	  
+		function init_select2() {
+			 
+			if( typeof (select2) === 'undefined'){ return; }
+			console.log('init_toolbox');
+			 
+			$(".select2_single").select2({
+			  placeholder: "Select a state",
+			  allowClear: true
+			});
+			$(".select2_group").select2({});
+			$(".select2_multiple").select2({
+			  maximumSelectionLength: 4,
+			  placeholder: "With Max Selection limit 4",
+			  allowClear: true
+			});
+			
+		};
+	   
+	   /* WYSIWYG EDITOR */
+
+		function init_wysiwyg() {
+			
+		if( typeof ($.fn.wysiwyg) === 'undefined'){ return; }
+		console.log('init_wysiwyg');	
+			
+        function init_ToolbarBootstrapBindings() {
+          var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
+              'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
+              'Times New Roman', 'Verdana'
+            ],
+            fontTarget = $('[title=Font]').siblings('.dropdown-menu');
+          $.each(fonts, function(idx, fontName) {
+            fontTarget.append($('<li><a data-edit="fontName ' + fontName + '" style="font-family:\'' + fontName + '\'">' + fontName + '</a></li>'));
           });
-
-        // create scrollbar
-        var bar = $(divS)
-          .addClass(o.barClass)
-          .css({
-            background: o.color,
-            width: o.size,
-            position: 'absolute',
-            top: 0,
-            opacity: o.opacity,
-            display: o.alwaysVisible ? 'block' : 'none',
-            'border-radius' : o.borderRadius,
-            BorderRadius: o.borderRadius,
-            MozBorderRadius: o.borderRadius,
-            WebkitBorderRadius: o.borderRadius,
-            zIndex: 99
+          $('a[title]').tooltip({
+            container: 'body'
           });
-
-        // set position
-        var posCss = (o.position == 'right') ? { right: o.distance } : { left: o.distance };
-        rail.css(posCss);
-        bar.css(posCss);
-
-        // wrap it
-        me.wrap(wrapper);
-
-        // append to parent div
-        me.parent().append(bar);
-        me.parent().append(rail);
-
-        // make it draggable and no longer dependent on the jqueryUI
-        if (o.railDraggable){
-          bar.bind("mousedown", function(e) {
-            var $doc = $(document);
-            isDragg = true;
-            t = parseFloat(bar.css('top'));
-            pageY = e.pageY;
-
-            $doc.bind("mousemove.slimscroll", function(e){
-              currTop = t + e.pageY - pageY;
-              bar.css('top', currTop);
-              scrollContent(0, bar.position().top, false);// scroll content
+          $('.dropdown-menu input').click(function() {
+              return false;
+            })
+            .change(function() {
+              $(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');
+            })
+            .keydown('esc', function() {
+              this.value = '';
+              $(this).change();
             });
 
-            $doc.bind("mouseup.slimscroll", function(e) {
-              isDragg = false;hideBar();
-              $doc.unbind('.slimscroll');
-            });
-            return false;
-          }).bind("selectstart.slimscroll", function(e){
-            e.stopPropagation();
-            e.preventDefault();
-            return false;
+          $('[data-role=magic-overlay]').each(function() {
+            var overlay = $(this),
+              target = $(overlay.data('target'));
+            overlay.css('opacity', 0).css('position', 'absolute').offset(target.offset()).width(target.outerWidth()).height(target.outerHeight());
           });
-        }
 
-        // on rail over
-        rail.hover(function(){
-          showBar();
-        }, function(){
-          hideBar();
-        });
+          if ("onwebkitspeechchange" in document.createElement("input")) {
+            var editorOffset = $('#editor').offset();
 
-        // on bar over
-        bar.hover(function(){
-          isOverBar = true;
-        }, function(){
-          isOverBar = false;
-        });
-
-        // show on parent mouseover
-        me.hover(function(){
-          isOverPanel = true;
-          showBar();
-          hideBar();
-        }, function(){
-          isOverPanel = false;
-          hideBar();
-        });
-
-        // support for mobile
-        me.bind('touchstart', function(e,b){
-          if (e.originalEvent.touches.length)
-          {
-            // record where touch started
-            touchDif = e.originalEvent.touches[0].pageY;
-          }
-        });
-
-        me.bind('touchmove', function(e){
-          // prevent scrolling the page if necessary
-          if(!releaseScroll)
-          {
-  		      e.originalEvent.preventDefault();
-		      }
-          if (e.originalEvent.touches.length)
-          {
-            // see how far user swiped
-            var diff = (touchDif - e.originalEvent.touches[0].pageY) / o.touchScrollStep;
-            // scroll content
-            scrollContent(diff, true);
-            touchDif = e.originalEvent.touches[0].pageY;
-          }
-        });
-
-        // set up initial height
-        getBarHeight();
-
-        // check start position
-        if (o.start === 'bottom')
-        {
-          // scroll content to bottom
-          bar.css({ top: me.outerHeight() - bar.outerHeight() });
-          scrollContent(0, true);
-        }
-        else if (o.start !== 'top')
-        {
-          // assume jQuery selector
-          scrollContent($(o.start).position().top, null, true);
-
-          // make sure bar stays hidden
-          if (!o.alwaysVisible) { bar.hide(); }
-        }
-
-        // attach scroll events
-        attachWheel(this);
-
-        function _onWheel(e)
-        {
-          // use mouse wheel only when mouse is over
-          if (!isOverPanel) { return; }
-
-          var e = e || window.event;
-
-          var delta = 0;
-          if (e.wheelDelta) { delta = -e.wheelDelta/120; }
-          if (e.detail) { delta = e.detail / 3; }
-
-          var target = e.target || e.srcTarget || e.srcElement;
-          if ($(target).closest('.' + o.wrapperClass).is(me.parent())) {
-            // scroll content
-            scrollContent(delta, true);
-          }
-
-          // stop window scroll
-          if (e.preventDefault && !releaseScroll) { e.preventDefault(); }
-          if (!releaseScroll) { e.returnValue = false; }
-        }
-
-        function scrollContent(y, isWheel, isJump)
-        {
-          releaseScroll = false;
-          var delta = y;
-          var maxTop = me.outerHeight() - bar.outerHeight();
-
-          if (isWheel)
-          {
-            // move bar with mouse wheel
-            delta = parseInt(bar.css('top')) + y * parseInt(o.wheelStep) / 100 * bar.outerHeight();
-
-            // move bar, make sure it doesn't go out
-            delta = Math.min(Math.max(delta, 0), maxTop);
-
-            // if scrolling down, make sure a fractional change to the
-            // scroll position isn't rounded away when the scrollbar's CSS is set
-            // this flooring of delta would happened automatically when
-            // bar.css is set below, but we floor here for clarity
-            delta = (y > 0) ? Math.ceil(delta) : Math.floor(delta);
-
-            // scroll the scrollbar
-            bar.css({ top: delta + 'px' });
-          }
-
-          // calculate actual scroll amount
-          percentScroll = parseInt(bar.css('top')) / (me.outerHeight() - bar.outerHeight());
-          delta = percentScroll * (me[0].scrollHeight - me.outerHeight());
-
-          if (isJump)
-          {
-            delta = y;
-            var offsetTop = delta / me[0].scrollHeight * me.outerHeight();
-            offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
-            bar.css({ top: offsetTop + 'px' });
-          }
-
-          // scroll content
-          me.scrollTop(delta);
-
-          // fire scrolling event
-          me.trigger('slimscrolling', ~~delta);
-
-          // ensure bar is visible
-          showBar();
-
-          // trigger hide when scroll is stopped
-          hideBar();
-        }
-
-        function attachWheel(target)
-        {
-          if (window.addEventListener)
-          {
-            target.addEventListener('DOMMouseScroll', _onWheel, false );
-            target.addEventListener('mousewheel', _onWheel, false );
-          }
-          else
-          {
-            document.attachEvent("onmousewheel", _onWheel)
+            $('.voiceBtn').css('position', 'absolute').offset({
+              top: editorOffset.top,
+              left: editorOffset.left + $('#editor').innerWidth() - 35
+            });
+          } else {
+            $('.voiceBtn').hide();
           }
         }
 
-        function getBarHeight()
-        {
-          // calculate scrollbar height and make sure it is not too small
-          barHeight = Math.max((me.outerHeight() / me[0].scrollHeight) * me.outerHeight(), minBarHeight);
-          bar.css({ height: barHeight + 'px' });
-
-          // hide scrollbar if content is not long enough
-          var display = barHeight == me.outerHeight() ? 'none' : 'block';
-          bar.css({ display: display });
+        function showErrorAlert(reason, detail) {
+          var msg = '';
+          if (reason === 'unsupported-file-type') {
+            msg = "Unsupported format " + detail;
+          } else {
+            console.log("error uploading file", reason, detail);
+          }
+          $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+            '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
         }
 
-        function showBar()
-        {
-          // recalculate bar height
-          getBarHeight();
-          clearTimeout(queueHide);
+       $('.editor-wrapper').each(function(){
+			var id = $(this).attr('id');	//editor-one
+			
+			$(this).wysiwyg({
+				toolbarSelector: '[data-target="#' + id + '"]',
+				fileUploadError: showErrorAlert
+			});	
+		});
+ 
+		
+        window.prettyPrint;
+        prettyPrint();
+	
+    };
+	  
+	/* CROPPER */
+		
+		function init_cropper() {
+			
+			
+			if( typeof ($.fn.cropper) === 'undefined'){ return; }
+			console.log('init_cropper');
+			
+			var $image = $('#image');
+			var $download = $('#download');
+			var $dataX = $('#dataX');
+			var $dataY = $('#dataY');
+			var $dataHeight = $('#dataHeight');
+			var $dataWidth = $('#dataWidth');
+			var $dataRotate = $('#dataRotate');
+			var $dataScaleX = $('#dataScaleX');
+			var $dataScaleY = $('#dataScaleY');
+			var options = {
+				  aspectRatio: 16 / 9,
+				  preview: '.img-preview',
+				  crop: function (e) {
+					$dataX.val(Math.round(e.x));
+					$dataY.val(Math.round(e.y));
+					$dataHeight.val(Math.round(e.height));
+					$dataWidth.val(Math.round(e.width));
+					$dataRotate.val(e.rotate);
+					$dataScaleX.val(e.scaleX);
+					$dataScaleY.val(e.scaleY);
+				  }
+				};
 
-          // when bar reached top or bottom
-          if (percentScroll == ~~percentScroll)
-          {
-            //release wheel
-            releaseScroll = o.allowPageScroll;
 
-            // publish approporiate event
-            if (lastScroll != percentScroll)
-            {
-                var msg = (~~percentScroll == 0) ? 'top' : 'bottom';
-                me.trigger('slimscroll', msg);
-            }
-          }
-          else
-          {
-            releaseScroll = false;
-          }
-          lastScroll = percentScroll;
+			// Tooltip
+			$('[data-toggle="tooltip"]').tooltip();
 
-          // show only when required
-          if(barHeight >= me.outerHeight()) {
-            //allow window scroll
-            releaseScroll = true;
-            return;
-          }
-          bar.stop(true,true).fadeIn('fast');
-          if (o.railVisible) { rail.stop(true,true).fadeIn('fast'); }
-        }
 
-        function hideBar()
-        {
-          // only hide when options allow it
-          if (!o.alwaysVisible)
-          {
-            queueHide = setTimeout(function(){
-              if (!(o.disableFadeOut && isOverPanel) && !isOverBar && !isDragg)
-              {
-                bar.fadeOut('slow');
-                rail.fadeOut('slow');
-              }
-            }, 1000);
-          }
-        }
+			// Cropper
+			$image.on({
+			  'build.cropper': function (e) {
+				console.log(e.type);
+			  },
+			  'built.cropper': function (e) {
+				console.log(e.type);
+			  },
+			  'cropstart.cropper': function (e) {
+				console.log(e.type, e.action);
+			  },
+			  'cropmove.cropper': function (e) {
+				console.log(e.type, e.action);
+			  },
+			  'cropend.cropper': function (e) {
+				console.log(e.type, e.action);
+			  },
+			  'crop.cropper': function (e) {
+				console.log(e.type, e.x, e.y, e.width, e.height, e.rotate, e.scaleX, e.scaleY);
+			  },
+			  'zoom.cropper': function (e) {
+				console.log(e.type, e.ratio);
+			  }
+			}).cropper(options);
 
+
+			// Buttons
+			if (!$.isFunction(document.createElement('canvas').getContext)) {
+			  $('button[data-method="getCroppedCanvas"]').prop('disabled', true);
+			}
+
+			if (typeof document.createElement('cropper').style.transition === 'undefined') {
+			  $('button[data-method="rotate"]').prop('disabled', true);
+			  $('button[data-method="scale"]').prop('disabled', true);
+			}
+
+
+			// Download
+			if (typeof $download[0].download === 'undefined') {
+			  $download.addClass('disabled');
+			}
+
+
+			// Options
+			$('.docs-toggles').on('change', 'input', function () {
+			  var $this = $(this);
+			  var name = $this.attr('name');
+			  var type = $this.prop('type');
+			  var cropBoxData;
+			  var canvasData;
+
+			  if (!$image.data('cropper')) {
+				return;
+			  }
+
+			  if (type === 'checkbox') {
+				options[name] = $this.prop('checked');
+				cropBoxData = $image.cropper('getCropBoxData');
+				canvasData = $image.cropper('getCanvasData');
+
+				options.built = function () {
+				  $image.cropper('setCropBoxData', cropBoxData);
+				  $image.cropper('setCanvasData', canvasData);
+				};
+			  } else if (type === 'radio') {
+				options[name] = $this.val();
+			  }
+
+			  $image.cropper('destroy').cropper(options);
+			});
+
+
+			// Methods
+			$('.docs-buttons').on('click', '[data-method]', function () {
+			  var $this = $(this);
+			  var data = $this.data();
+			  var $target;
+			  var result;
+
+			  if ($this.prop('disabled') || $this.hasClass('disabled')) {
+				return;
+			  }
+
+			  if ($image.data('cropper') && data.method) {
+				data = $.extend({}, data); // Clone a new one
+
+				if (typeof data.target !== 'undefined') {
+				  $target = $(data.target);
+
+				  if (typeof data.option === 'undefined') {
+					try {
+					  data.option = JSON.parse($target.val());
+					} catch (e) {
+					  console.log(e.message);
+					}
+				  }
+				}
+
+				result = $image.cropper(data.method, data.option, data.secondOption);
+
+				switch (data.method) {
+				  case 'scaleX':
+				  case 'scaleY':
+					$(this).data('option', -data.option);
+					break;
+
+				  case 'getCroppedCanvas':
+					if (result) {
+
+					  // Bootstrap's Modal
+					  $('#getCroppedCanvasModal').modal().find('.modal-body').html(result);
+
+					  if (!$download.hasClass('disabled')) {
+						$download.attr('href', result.toDataURL());
+					  }
+					}
+
+					break;
+				}
+
+				if ($.isPlainObject(result) && $target) {
+				  try {
+					$target.val(JSON.stringify(result));
+				  } catch (e) {
+					console.log(e.message);
+				  }
+				}
+
+			  }
+			});
+
+			// Keyboard
+			$(document.body).on('keydown', function (e) {
+			  if (!$image.data('cropper') || this.scrollTop > 300) {
+				return;
+			  }
+
+			  switch (e.which) {
+				case 37:
+				  e.preventDefault();
+				  $image.cropper('move', -1, 0);
+				  break;
+
+				case 38:
+				  e.preventDefault();
+				  $image.cropper('move', 0, -1);
+				  break;
+
+				case 39:
+				  e.preventDefault();
+				  $image.cropper('move', 1, 0);
+				  break;
+
+				case 40:
+				  e.preventDefault();
+				  $image.cropper('move', 0, 1);
+				  break;
+			  }
+			});
+
+			// Import image
+			var $inputImage = $('#inputImage');
+			var URL = window.URL || window.webkitURL;
+			var blobURL;
+
+			if (URL) {
+			  $inputImage.change(function () {
+				var files = this.files;
+				var file;
+
+				if (!$image.data('cropper')) {
+				  return;
+				}
+
+				if (files && files.length) {
+				  file = files[0];
+
+				  if (/^image\/\w+$/.test(file.type)) {
+					blobURL = URL.createObjectURL(file);
+					$image.one('built.cropper', function () {
+
+					  // Revoke when load complete
+					  URL.revokeObjectURL(blobURL);
+					}).cropper('reset').cropper('replace', blobURL);
+					$inputImage.val('');
+				  } else {
+					window.alert('Please choose an image file.');
+				  }
+				}
+			  });
+			} else {
+			  $inputImage.prop('disabled', true).parent().addClass('disabled');
+			}
+			
+			
+		};
+		
+		/* CROPPER --- end */  
+	  
+		/* KNOB */
+	  
+		function init_knob() {
+		
+				if( typeof ($.fn.knob) === 'undefined'){ return; }
+				console.log('init_knob');
+	
+				$(".knob").knob({
+				  change: function(value) {
+					//console.log("change : " + value);
+				  },
+				  release: function(value) {
+					//console.log(this.$.attr('value'));
+					console.log("release : " + value);
+				  },
+				  cancel: function() {
+					console.log("cancel : ", this);
+				  },
+				  /*format : function (value) {
+				   return value + '%';
+				   },*/
+				  draw: function() {
+
+					// "tron" case
+					if (this.$.data('skin') == 'tron') {
+
+					  this.cursorExt = 0.3;
+
+					  var a = this.arc(this.cv) // Arc
+						,
+						pa // Previous arc
+						, r = 1;
+
+					  this.g.lineWidth = this.lineWidth;
+
+					  if (this.o.displayPrevious) {
+						pa = this.arc(this.v);
+						this.g.beginPath();
+						this.g.strokeStyle = this.pColor;
+						this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+						this.g.stroke();
+					  }
+
+					  this.g.beginPath();
+					  this.g.strokeStyle = r ? this.o.fgColor : this.fgColor;
+					  this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+					  this.g.stroke();
+
+					  this.g.lineWidth = 2;
+					  this.g.beginPath();
+					  this.g.strokeStyle = this.o.fgColor;
+					  this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+					  this.g.stroke();
+
+					  return false;
+					}
+				  }
+				  
+				});
+
+				// Example of infinite knob, iPod click wheel
+				var v, up = 0,
+				  down = 0,
+				  i = 0,
+				  $idir = $("div.idir"),
+				  $ival = $("div.ival"),
+				  incr = function() {
+					i++;
+					$idir.show().html("+").fadeOut();
+					$ival.html(i);
+				  },
+				  decr = function() {
+					i--;
+					$idir.show().html("-").fadeOut();
+					$ival.html(i);
+				  };
+				$("input.infinite").knob({
+				  min: 0,
+				  max: 20,
+				  stopper: false,
+				  change: function() {
+					if (v > this.cv) {
+					  if (up) {
+						decr();
+						up = 0;
+					  } else {
+						up = 1;
+						down = 0;
+					  }
+					} else {
+					  if (v < this.cv) {
+						if (down) {
+						  incr();
+						  down = 0;
+						} else {
+						  down = 1;
+						  up = 0;
+						}
+					  }
+					}
+					v = this.cv;
+				  }
+				});
+				
+		};
+	 
+		/* INPUT MASK */
+			
+		function init_InputMask() {
+			
+			if( typeof ($.fn.inputmask) === 'undefined'){ return; }
+			console.log('init_InputMask');
+			
+				$(":input").inputmask();
+				
+		};
+	  
+		/* COLOR PICKER */
+			 
+		function init_ColorPicker() {
+			
+			if( typeof ($.fn.colorpicker) === 'undefined'){ return; }
+			console.log('init_ColorPicker');
+			
+				$('.demo1').colorpicker();
+				$('.demo2').colorpicker();
+
+				$('#demo_forceformat').colorpicker({
+					format: 'rgba',
+					horizontal: true
+				});
+
+				$('#demo_forceformat3').colorpicker({
+					format: 'rgba',
+				});
+
+				$('.demo-auto').colorpicker();
+			
+		}; 
+	   
+	   
+		/* ION RANGE SLIDER */
+			
+		function init_IonRangeSlider() {
+			
+			if( typeof ($.fn.ionRangeSlider) === 'undefined'){ return; }
+			console.log('init_IonRangeSlider');
+			
+			$("#range_27").ionRangeSlider({
+			  type: "double",
+			  min: 1000000,
+			  max: 2000000,
+			  grid: true,
+			  force_edges: true
+			});
+			$("#range").ionRangeSlider({
+			  hide_min_max: true,
+			  keyboard: true,
+			  min: 0,
+			  max: 5000,
+			  from: 1000,
+			  to: 4000,
+			  type: 'double',
+			  step: 1,
+			  prefix: "$",
+			  grid: true
+			});
+			$("#range_25").ionRangeSlider({
+			  type: "double",
+			  min: 1000000,
+			  max: 2000000,
+			  grid: true
+			});
+			$("#range_26").ionRangeSlider({
+			  type: "double",
+			  min: 0,
+			  max: 10000,
+			  step: 500,
+			  grid: true,
+			  grid_snap: true
+			});
+			$("#range_31").ionRangeSlider({
+			  type: "double",
+			  min: 0,
+			  max: 100,
+			  from: 30,
+			  to: 70,
+			  from_fixed: true
+			});
+			$(".range_min_max").ionRangeSlider({
+			  type: "double",
+			  min: 0,
+			  max: 100,
+			  from: 30,
+			  to: 70,
+			  max_interval: 50
+			});
+			$(".range_time24").ionRangeSlider({
+			  min: +moment().subtract(12, "hours").format("X"),
+			  max: +moment().format("X"),
+			  from: +moment().subtract(6, "hours").format("X"),
+			  grid: true,
+			  force_edges: true,
+			  prettify: function(num) {
+				var m = moment(num, "X");
+				return m.format("Do MMMM, HH:mm");
+			  }
+			});
+			
+		};
+	   
+	   
+	   /* DATERANGEPICKER */
+	   
+		function init_daterangepicker() {
+
+			if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+			console.log('init_daterangepicker');
+		
+			var cb = function(start, end, label) {
+			  console.log(start.toISOString(), end.toISOString(), label);
+			  $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+			};
+
+			var optionSet1 = {
+			  startDate: moment().subtract(29, 'days'),
+			  endDate: moment(),
+			  minDate: '01/01/2012',
+			  maxDate: '12/31/2015',
+			  dateLimit: {
+				days: 60
+			  },
+			  showDropdowns: true,
+			  showWeekNumbers: true,
+			  timePicker: false,
+			  timePickerIncrement: 1,
+			  timePicker12Hour: true,
+			  ranges: {
+				'Today': [moment(), moment()],
+				'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+				'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+				'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+				'This Month': [moment().startOf('month'), moment().endOf('month')],
+				'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+			  },
+			  opens: 'left',
+			  buttonClasses: ['btn btn-default'],
+			  applyClass: 'btn-small btn-primary',
+			  cancelClass: 'btn-small',
+			  format: 'MM/DD/YYYY',
+			  separator: ' to ',
+			  locale: {
+				applyLabel: 'Submit',
+				cancelLabel: 'Clear',
+				fromLabel: 'From',
+				toLabel: 'To',
+				customRangeLabel: 'Custom',
+				daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+				monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+				firstDay: 1
+			  }
+			};
+			
+			$('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+			$('#reportrange').daterangepicker(optionSet1, cb);
+			$('#reportrange').on('show.daterangepicker', function() {
+			  console.log("show event fired");
+			});
+			$('#reportrange').on('hide.daterangepicker', function() {
+			  console.log("hide event fired");
+			});
+			$('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+			  console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+			});
+			$('#reportrange').on('cancel.daterangepicker', function(ev, picker) {
+			  console.log("cancel event fired");
+			});
+			$('#options1').click(function() {
+			  $('#reportrange').data('daterangepicker').setOptions(optionSet1, cb);
+			});
+			$('#options2').click(function() {
+			  $('#reportrange').data('daterangepicker').setOptions(optionSet2, cb);
+			});
+			$('#destroy').click(function() {
+			  $('#reportrange').data('daterangepicker').remove();
+			});
+   
+		}
+   	   
+	   function init_daterangepicker_right() {
+	      
+				if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+				console.log('init_daterangepicker_right');
+		  
+				var cb = function(start, end, label) {
+				  console.log(start.toISOString(), end.toISOString(), label);
+				  $('#reportrange_right span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+				};
+
+				var optionSet1 = {
+				  startDate: moment().subtract(29, 'days'),
+				  endDate: moment(),
+				  minDate: '01/01/2012',
+				  maxDate: '12/31/2020',
+				  dateLimit: {
+					days: 60
+				  },
+				  showDropdowns: true,
+				  showWeekNumbers: true,
+				  timePicker: false,
+				  timePickerIncrement: 1,
+				  timePicker12Hour: true,
+				  ranges: {
+					'Today': [moment(), moment()],
+					'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+					'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+					'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+					'This Month': [moment().startOf('month'), moment().endOf('month')],
+					'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+				  },
+				  opens: 'right',
+				  buttonClasses: ['btn btn-default'],
+				  applyClass: 'btn-small btn-primary',
+				  cancelClass: 'btn-small',
+				  format: 'MM/DD/YYYY',
+				  separator: ' to ',
+				  locale: {
+					applyLabel: 'Submit',
+					cancelLabel: 'Clear',
+					fromLabel: 'From',
+					toLabel: 'To',
+					customRangeLabel: 'Custom',
+					daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+					monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+					firstDay: 1
+				  }
+				};
+
+				$('#reportrange_right span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+
+				$('#reportrange_right').daterangepicker(optionSet1, cb);
+
+				$('#reportrange_right').on('show.daterangepicker', function() {
+				  console.log("show event fired");
+				});
+				$('#reportrange_right').on('hide.daterangepicker', function() {
+				  console.log("hide event fired");
+				});
+				$('#reportrange_right').on('apply.daterangepicker', function(ev, picker) {
+				  console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+				});
+				$('#reportrange_right').on('cancel.daterangepicker', function(ev, picker) {
+				  console.log("cancel event fired");
+				});
+
+				$('#options1').click(function() {
+				  $('#reportrange_right').data('daterangepicker').setOptions(optionSet1, cb);
+				});
+
+				$('#options2').click(function() {
+				  $('#reportrange_right').data('daterangepicker').setOptions(optionSet2, cb);
+				});
+
+				$('#destroy').click(function() {
+				  $('#reportrange_right').data('daterangepicker').remove();
+				});
+
+	   }
+	   
+	    function init_daterangepicker_single_call() {
+	      
+			if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+			console.log('init_daterangepicker_single_call');
+		   
+			$('#single_cal1').daterangepicker({
+			  singleDatePicker: true,
+			  singleClasses: "picker_1"
+			}, function(start, end, label) {
+			  console.log(start.toISOString(), end.toISOString(), label);
+			});
+			$('#single_cal2').daterangepicker({
+			  singleDatePicker: true,
+			  singleClasses: "picker_2"
+			}, function(start, end, label) {
+			  console.log(start.toISOString(), end.toISOString(), label);
+			});
+			$('#single_cal3').daterangepicker({
+			  singleDatePicker: true,
+			  singleClasses: "picker_3"
+			}, function(start, end, label) {
+			  console.log(start.toISOString(), end.toISOString(), label);
+			});
+			$('#single_cal4').daterangepicker({
+			  singleDatePicker: true,
+			  singleClasses: "picker_4"
+			}, function(start, end, label) {
+			  console.log(start.toISOString(), end.toISOString(), label);
+			});
+  
+  
+		}
+		
+		 
+		function init_daterangepicker_reservation() {
+	      
+			if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+			console.log('init_daterangepicker_reservation');
+		 
+			$('#reservation').daterangepicker(null, function(start, end, label) {
+			  console.log(start.toISOString(), end.toISOString(), label);
+			});
+
+			$('#reservation-time').daterangepicker({
+			  timePicker: true,
+			  timePickerIncrement: 30,
+			  locale: {
+				format: 'MM/DD/YYYY h:mm A'
+			  }
+			});
+	
+		}
+	   
+	   /* SMART WIZARD */
+		
+		function init_SmartWizard() {
+			
+			if( typeof ($.fn.smartWizard) === 'undefined'){ return; }
+			console.log('init_SmartWizard');
+			
+			$('#wizard').smartWizard();
+
+			$('#wizard_verticle').smartWizard({
+			  transitionEffect: 'slide'
+			});
+
+			$('.buttonNext').addClass('btn btn-success');
+			$('.buttonPrevious').addClass('btn btn-primary');
+			$('.buttonFinish').addClass('btn btn-default');
+			
+		};
+	   
+	   
+	  /* VALIDATOR */
+
+	  function init_validator () {
+		 
+		if( typeof (validator) === 'undefined'){ return; }
+		console.log('init_validator'); 
+	  
+	  // initialize the validator function
+      validator.message.date = 'not a real date';
+
+      // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
+      $('form')
+        .on('blur', 'input[required], input.optional, select.required', validator.checkField)
+        .on('change', 'select.required', validator.checkField)
+        .on('keypress', 'input[required][pattern]', validator.keypress);
+
+      $('.multi.required').on('keyup blur', 'input', function() {
+        validator.checkField.apply($(this).siblings().last()[0]);
       });
 
-      // maintain chainability
-      return this;
-    }
-  });
+      $('form').submit(function(e) {
+        e.preventDefault();
+        var submit = true;
 
-  $.fn.extend({
-    slimscroll: $.fn.slimScroll
-  });
+        // evaluate the form using generic validaing
+        if (!validator.checkAll($(this))) {
+          submit = false;
+        }
 
-})(jQuery);
+        if (submit)
+          this.submit();
+
+        return false;
+		});
+	  
+	  };
+	   
+	  	/* PNotify */
+			
+		function init_PNotify() {
+			
+			if( typeof (PNotify) === 'undefined'){ return; }
+			console.log('init_PNotify');
+			
+			new PNotify({
+			  title: "PNotify",
+			  type: "info",
+			  text: "Welcome. Try hovering over me. You can click things behind me, because I'm non-blocking.",
+			  nonblock: {
+				  nonblock: true
+			  },
+			  addclass: 'dark',
+			  styling: 'bootstrap3',
+			  hide: false,
+			  before_close: function(PNotify) {
+				PNotify.update({
+				  title: PNotify.options.title + " - Enjoy your Stay",
+				  before_close: null
+				});
+
+				PNotify.queueRemove();
+
+				return false;
+			  }
+			});
+
+		}; 
+	   
+	   
+	   /* CUSTOM NOTIFICATION */
+			
+		function init_CustomNotification() {
+			
+			console.log('run_customtabs');
+			
+			if( typeof (CustomTabs) === 'undefined'){ return; }
+			console.log('init_CustomTabs');
+			
+			var cnt = 10;
+
+			TabbedNotification = function(options) {
+			  var message = "<div id='ntf" + cnt + "' class='text alert-" + options.type + "' style='display:none'><h2><i class='fa fa-bell'></i> " + options.title +
+				"</h2><div class='close'><a href='javascript:;' class='notification_close'><i class='fa fa-close'></i></a></div><p>" + options.text + "</p></div>";
+
+			  if (!document.getElementById('custom_notifications')) {
+				alert('doesnt exists');
+			  } else {
+				$('#custom_notifications ul.notifications').append("<li><a id='ntlink" + cnt + "' class='alert-" + options.type + "' href='#ntf" + cnt + "'><i class='fa fa-bell animated shake'></i></a></li>");
+				$('#custom_notifications #notif-group').append(message);
+				cnt++;
+				CustomTabs(options);
+			  }
+			};
+
+			CustomTabs = function(options) {
+			  $('.tabbed_notifications > div').hide();
+			  $('.tabbed_notifications > div:first-of-type').show();
+			  $('#custom_notifications').removeClass('dsp_none');
+			  $('.notifications a').click(function(e) {
+				e.preventDefault();
+				var $this = $(this),
+				  tabbed_notifications = '#' + $this.parents('.notifications').data('tabbed_notifications'),
+				  others = $this.closest('li').siblings().children('a'),
+				  target = $this.attr('href');
+				others.removeClass('active');
+				$this.addClass('active');
+				$(tabbed_notifications).children('div').hide();
+				$(target).show();
+			  });
+			};
+
+			CustomTabs();
+
+			var tabid = idname = '';
+
+			$(document).on('click', '.notification_close', function(e) {
+			  idname = $(this).parent().parent().attr("id");
+			  tabid = idname.substr(-2);
+			  $('#ntf' + tabid).remove();
+			  $('#ntlink' + tabid).parent().remove();
+			  $('.notifications a').first().addClass('active');
+			  $('#notif-group div').first().css('display', 'block');
+			});
+			
+		};
+		
+			/* EASYPIECHART */
+			
+			function init_EasyPieChart() {
+				
+				if( typeof ($.fn.easyPieChart) === 'undefined'){ return; }
+				console.log('init_EasyPieChart');
+				
+				$('.chart').easyPieChart({
+				  easing: 'easeOutElastic',
+				  delay: 3000,
+				  barColor: '#26B99A',
+				  trackColor: '#fff',
+				  scaleColor: false,
+				  lineWidth: 20,
+				  trackWidth: 16,
+				  lineCap: 'butt',
+				  onStep: function(from, to, percent) {
+					$(this.el).find('.percent').text(Math.round(percent));
+				  }
+				});
+				var chart = window.chart = $('.chart').data('easyPieChart');
+				$('.js_update').on('click', function() {
+				  chart.update(Math.random() * 200 - 100);
+				});
+
+				//hover and retain popover when on popover content
+				var originalLeave = $.fn.popover.Constructor.prototype.leave;
+				$.fn.popover.Constructor.prototype.leave = function(obj) {
+				  var self = obj instanceof this.constructor ?
+					obj : $(obj.currentTarget)[this.type](this.getDelegateOptions()).data('bs.' + this.type);
+				  var container, timeout;
+
+				  originalLeave.call(this, obj);
+
+				  if (obj.currentTarget) {
+					container = $(obj.currentTarget).siblings('.popover');
+					timeout = self.timeout;
+					container.one('mouseenter', function() {
+					  //We entered the actual popover – call off the dogs
+					  clearTimeout(timeout);
+					  //Let's monitor popover content instead
+					  container.one('mouseleave', function() {
+						$.fn.popover.Constructor.prototype.leave.call(self, self);
+					  });
+					});
+				  }
+				};
+
+				$('body').popover({
+				  selector: '[data-popover]',
+				  trigger: 'click hover',
+				  delay: {
+					show: 50,
+					hide: 400
+				  }
+				});
+				
+			};
+	   
+		
+		function init_charts() {
+			
+				console.log('run_charts  typeof [' + typeof (Chart) + ']');
+			
+				if( typeof (Chart) === 'undefined'){ return; }
+				
+				console.log('init_charts');
+			
+				
+				Chart.defaults.global.legend = {
+					enabled: false
+				};
+				
+				
+
+			if ($('#canvas_line').length ){
+				
+				var canvas_line_00 = new Chart(document.getElementById("canvas_line"), {
+				  type: 'line',
+				  data: {
+					labels: ["January", "February", "March", "April", "May", "June", "July"],
+					datasets: [{
+					  label: "My First dataset",
+					  backgroundColor: "rgba(38, 185, 154, 0.31)",
+					  borderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBorderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(220,220,220,1)",
+					  pointBorderWidth: 1,
+					  data: [31, 74, 6, 39, 20, 85, 7]
+					}, {
+					  label: "My Second dataset",
+					  backgroundColor: "rgba(3, 88, 106, 0.3)",
+					  borderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBorderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(151,187,205,1)",
+					  pointBorderWidth: 1,
+					  data: [82, 23, 66, 9, 99, 4, 2]
+					}]
+				  },
+				});
+				
+			}
+
+			
+			if ($('#canvas_line1').length ){
+			
+				var canvas_line_01 = new Chart(document.getElementById("canvas_line1"), {
+				  type: 'line',
+				  data: {
+					labels: ["January", "February", "March", "April", "May", "June", "July"],
+					datasets: [{
+					  label: "My First dataset",
+					  backgroundColor: "rgba(38, 185, 154, 0.31)",
+					  borderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBorderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(220,220,220,1)",
+					  pointBorderWidth: 1,
+					  data: [31, 74, 6, 39, 20, 85, 7]
+					}, {
+					  label: "My Second dataset",
+					  backgroundColor: "rgba(3, 88, 106, 0.3)",
+					  borderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBorderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(151,187,205,1)",
+					  pointBorderWidth: 1,
+					  data: [82, 23, 66, 9, 99, 4, 2]
+					}]
+				  },
+				});
+			
+			}
+				
+				
+			if ($('#canvas_line2').length ){		
+			
+				var canvas_line_02 = new Chart(document.getElementById("canvas_line2"), {
+				  type: 'line',
+				  data: {
+					labels: ["January", "February", "March", "April", "May", "June", "July"],
+					datasets: [{
+					  label: "My First dataset",
+					  backgroundColor: "rgba(38, 185, 154, 0.31)",
+					  borderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBorderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(220,220,220,1)",
+					  pointBorderWidth: 1,
+					  data: [31, 74, 6, 39, 20, 85, 7]
+					}, {
+					  label: "My Second dataset",
+					  backgroundColor: "rgba(3, 88, 106, 0.3)",
+					  borderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBorderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(151,187,205,1)",
+					  pointBorderWidth: 1,
+					  data: [82, 23, 66, 9, 99, 4, 2]
+					}]
+				  },
+				});
+
+			}	
+			
+			
+			if ($('#canvas_line3').length ){
+			
+				var canvas_line_03 = new Chart(document.getElementById("canvas_line3"), {
+				  type: 'line',
+				  data: {
+					labels: ["January", "February", "March", "April", "May", "June", "July"],
+					datasets: [{
+					  label: "My First dataset",
+					  backgroundColor: "rgba(38, 185, 154, 0.31)",
+					  borderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBorderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(220,220,220,1)",
+					  pointBorderWidth: 1,
+					  data: [31, 74, 6, 39, 20, 85, 7]
+					}, {
+					  label: "My Second dataset",
+					  backgroundColor: "rgba(3, 88, 106, 0.3)",
+					  borderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBorderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(151,187,205,1)",
+					  pointBorderWidth: 1,
+					  data: [82, 23, 66, 9, 99, 4, 2]
+					}]
+				  },
+				});
+
+			}	
+			
+			
+			if ($('#canvas_line4').length ){
+				
+				var canvas_line_04 = new Chart(document.getElementById("canvas_line4"), {
+				  type: 'line',
+				  data: {
+					labels: ["January", "February", "March", "April", "May", "June", "July"],
+					datasets: [{
+					  label: "My First dataset",
+					  backgroundColor: "rgba(38, 185, 154, 0.31)",
+					  borderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBorderColor: "rgba(38, 185, 154, 0.7)",
+					  pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(220,220,220,1)",
+					  pointBorderWidth: 1,
+					  data: [31, 74, 6, 39, 20, 85, 7]
+					}, {
+					  label: "My Second dataset",
+					  backgroundColor: "rgba(3, 88, 106, 0.3)",
+					  borderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBorderColor: "rgba(3, 88, 106, 0.70)",
+					  pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
+					  pointHoverBackgroundColor: "#fff",
+					  pointHoverBorderColor: "rgba(151,187,205,1)",
+					  pointBorderWidth: 1,
+					  data: [82, 23, 66, 9, 99, 4, 2]
+					}]
+				  },
+				});		
+				
+			}
+			
+				
+			  // Line chart
+			 
+			if ($('#lineChart').length ){	
+			
+			  var ctx = document.getElementById("lineChart");
+			  var lineChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+				  labels: ["January", "February", "March", "April", "May", "June", "July"],
+				  datasets: [{
+					label: "My First dataset",
+					backgroundColor: "rgba(38, 185, 154, 0.31)",
+					borderColor: "rgba(38, 185, 154, 0.7)",
+					pointBorderColor: "rgba(38, 185, 154, 0.7)",
+					pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
+					pointHoverBackgroundColor: "#fff",
+					pointHoverBorderColor: "rgba(220,220,220,1)",
+					pointBorderWidth: 1,
+					data: [31, 74, 6, 39, 20, 85, 7]
+				  }, {
+					label: "My Second dataset",
+					backgroundColor: "rgba(3, 88, 106, 0.3)",
+					borderColor: "rgba(3, 88, 106, 0.70)",
+					pointBorderColor: "rgba(3, 88, 106, 0.70)",
+					pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
+					pointHoverBackgroundColor: "#fff",
+					pointHoverBorderColor: "rgba(151,187,205,1)",
+					pointBorderWidth: 1,
+					data: [82, 23, 66, 9, 99, 4, 2]
+				  }]
+				},
+			  });
+			
+			}
+				
+			  // Bar chart
+			  
+			if ($('#mybarChart').length ){ 
+			  
+			  var ctx = document.getElementById("mybarChart");
+			  var mybarChart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+				  labels: ["January", "February", "March", "April", "May", "June", "July"],
+				  datasets: [{
+					label: '# of Votes',
+					backgroundColor: "#26B99A",
+					data: [51, 30, 40, 28, 92, 50, 45]
+				  }, {
+					label: '# of Votes',
+					backgroundColor: "#03586A",
+					data: [41, 56, 25, 48, 72, 34, 12]
+				  }]
+				},
+
+				options: {
+				  scales: {
+					yAxes: [{
+					  ticks: {
+						beginAtZero: true
+					  }
+					}]
+				  }
+				}
+			  });
+			  
+			} 
+			  
+
+			  // Doughnut chart
+			  
+			if ($('#canvasDoughnut').length ){ 
+			  
+			  var ctx = document.getElementById("canvasDoughnut");
+			  var data = {
+				labels: [
+				  "Dark Grey",
+				  "Purple Color",
+				  "Gray Color",
+				  "Green Color",
+				  "Blue Color"
+				],
+				datasets: [{
+				  data: [120, 50, 140, 180, 100],
+				  backgroundColor: [
+					"#455C73",
+					"#9B59B6",
+					"#BDC3C7",
+					"#26B99A",
+					"#3498DB"
+				  ],
+				  hoverBackgroundColor: [
+					"#34495E",
+					"#B370CF",
+					"#CFD4D8",
+					"#36CAAB",
+					"#49A9EA"
+				  ]
+
+				}]
+			  };
+
+			  var canvasDoughnut = new Chart(ctx, {
+				type: 'doughnut',
+				tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+				data: data
+			  });
+			 
+			} 
+
+			  // Radar chart
+			  
+			if ($('#canvasRadar').length ){ 
+			  
+			  var ctx = document.getElementById("canvasRadar");
+			  var data = {
+				labels: ["Eating", "Drinking", "Sleeping", "Designing", "Coding", "Cycling", "Running"],
+				datasets: [{
+				  label: "My First dataset",
+				  backgroundColor: "rgba(3, 88, 106, 0.2)",
+				  borderColor: "rgba(3, 88, 106, 0.80)",
+				  pointBorderColor: "rgba(3, 88, 106, 0.80)",
+				  pointBackgroundColor: "rgba(3, 88, 106, 0.80)",
+				  pointHoverBackgroundColor: "#fff",
+				  pointHoverBorderColor: "rgba(220,220,220,1)",
+				  data: [65, 59, 90, 81, 56, 55, 40]
+				}, {
+				  label: "My Second dataset",
+				  backgroundColor: "rgba(38, 185, 154, 0.2)",
+				  borderColor: "rgba(38, 185, 154, 0.85)",
+				  pointColor: "rgba(38, 185, 154, 0.85)",
+				  pointStrokeColor: "#fff",
+				  pointHighlightFill: "#fff",
+				  pointHighlightStroke: "rgba(151,187,205,1)",
+				  data: [28, 48, 40, 19, 96, 27, 100]
+				}]
+			  };
+
+			  var canvasRadar = new Chart(ctx, {
+				type: 'radar',
+				data: data,
+			  });
+			
+			}
+			
+			
+			  // Pie chart
+			  if ($('#pieChart').length ){
+				  
+				  var ctx = document.getElementById("pieChart");
+				  var data = {
+					datasets: [{
+					  data: [120, 50, 140, 180, 100],
+					  backgroundColor: [
+						"#455C73",
+						"#9B59B6",
+						"#BDC3C7",
+						"#26B99A",
+						"#3498DB"
+					  ],
+					  label: 'My dataset' // for legend
+					}],
+					labels: [
+					  "Dark Gray",
+					  "Purple",
+					  "Gray",
+					  "Green",
+					  "Blue"
+					]
+				  };
+
+				  var pieChart = new Chart(ctx, {
+					data: data,
+					type: 'pie',
+					otpions: {
+					  legend: false
+					}
+				  });
+				  
+			  }
+			
+			  
+			  // PolarArea chart
+
+			if ($('#polarArea').length ){
+
+				var ctx = document.getElementById("polarArea");
+				var data = {
+				datasets: [{
+				  data: [120, 50, 140, 180, 100],
+				  backgroundColor: [
+					"#455C73",
+					"#9B59B6",
+					"#BDC3C7",
+					"#26B99A",
+					"#3498DB"
+				  ],
+				  label: 'My dataset'
+				}],
+				labels: [
+				  "Dark Gray",
+				  "Purple",
+				  "Gray",
+				  "Green",
+				  "Blue"
+				]
+				};
+
+				var polarArea = new Chart(ctx, {
+				data: data,
+				type: 'polarArea',
+				options: {
+				  scale: {
+					ticks: {
+					  beginAtZero: true
+					}
+				  }
+				}
+				});
+			
+			}
+		}
+
+		/* COMPOSE */
+		
+		function init_compose() {
+		
+			if( typeof ($.fn.slideToggle) === 'undefined'){ return; }
+			console.log('init_compose');
+		
+			$('#compose, .compose-close').click(function(){
+				$('.compose').slideToggle();
+			});
+		
+		};
+	   
+	   	/* CALENDAR */
+		  
+		    function  init_calendar() {
+					
+				if( typeof ($.fn.fullCalendar) === 'undefined'){ return; }
+				console.log('init_calendar');
+					
+				var date = new Date(),
+					d = date.getDate(),
+					m = date.getMonth(),
+					y = date.getFullYear(),
+					started,
+					categoryClass;
+
+				var calendar = $('#calendar').fullCalendar({
+				  header: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'month,agendaWeek,agendaDay,listMonth'
+				  },
+				  selectable: true,
+				  selectHelper: true,
+				  select: function(start, end, allDay) {
+					$('#fc_create').click();
+
+					started = start;
+					ended = end;
+
+					$(".antosubmit").on("click", function() {
+					  var title = $("#title").val();
+					  if (end) {
+						ended = end;
+					  }
+
+					  categoryClass = $("#event_type").val();
+
+					  if (title) {
+						calendar.fullCalendar('renderEvent', {
+							title: title,
+							start: started,
+							end: end,
+							allDay: allDay
+						  },
+						  true // make the event "stick"
+						);
+					  }
+
+					  $('#title').val('');
+
+					  calendar.fullCalendar('unselect');
+
+					  $('.antoclose').click();
+
+					  return false;
+					});
+				  },
+				  eventClick: function(calEvent, jsEvent, view) {
+					$('#fc_edit').click();
+					$('#title2').val(calEvent.title);
+
+					categoryClass = $("#event_type").val();
+
+					$(".antosubmit2").on("click", function() {
+					  calEvent.title = $("#title2").val();
+
+					  calendar.fullCalendar('updateEvent', calEvent);
+					  $('.antoclose2').click();
+					});
+
+					calendar.fullCalendar('unselect');
+				  },
+				  editable: true,
+				  events: [{
+					title: 'All Day Event',
+					start: new Date(y, m, 1)
+				  }, {
+					title: 'Long Event',
+					start: new Date(y, m, d - 5),
+					end: new Date(y, m, d - 2)
+				  }, {
+					title: 'Meeting',
+					start: new Date(y, m, d, 10, 30),
+					allDay: false
+				  }, {
+					title: 'Lunch',
+					start: new Date(y, m, d + 14, 12, 0),
+					end: new Date(y, m, d, 14, 0),
+					allDay: false
+				  }, {
+					title: 'Birthday Party',
+					start: new Date(y, m, d + 1, 19, 0),
+					end: new Date(y, m, d + 1, 22, 30),
+					allDay: false
+				  }, {
+					title: 'Click for Google',
+					start: new Date(y, m, 28),
+					end: new Date(y, m, 29),
+					url: 'http://google.com/'
+				  }]
+				});
+				
+			};
+	   
+		/* DATA TABLES */
+			
+			function init_DataTables() {
+				
+				console.log('run_datatables');
+				
+				if( typeof ($.fn.DataTable) === 'undefined'){ return; }
+				console.log('init_DataTables');
+				
+				var handleDataTableButtons = function() {
+				  if ($("#datatable-buttons").length) {
+					$("#datatable-buttons").DataTable({
+					  dom: "Bfrtip",
+					  buttons: [
+						{
+						  extend: "copy",
+						  className: "btn-sm"
+						},
+						{
+						  extend: "csv",
+						  className: "btn-sm"
+						},
+						{
+						  extend: "excel",
+						  className: "btn-sm"
+						},
+						{
+						  extend: "pdfHtml5",
+						  className: "btn-sm"
+						},
+						{
+						  extend: "print",
+						  className: "btn-sm"
+						},
+					  ],
+					  responsive: true
+					});
+				  }
+				};
+
+				TableManageButtons = function() {
+				  "use strict";
+				  return {
+					init: function() {
+					  handleDataTableButtons();
+					}
+				  };
+				}();
+
+				$('#datatable').dataTable();
+
+				$('#datatable-keytable').DataTable({
+				  keys: true
+				});
+
+				$('#datatable-responsive').DataTable();
+
+				$('#datatable-scroller').DataTable({
+				  ajax: "js/datatables/json/scroller-demo.json",
+				  deferRender: true,
+				  scrollY: 380,
+				  scrollCollapse: true,
+				  scroller: true
+				});
+
+				$('#datatable-fixed-header').DataTable({
+				  fixedHeader: true
+				});
+
+				var $datatable = $('#datatable-checkbox');
+
+				$datatable.dataTable({
+				  'order': [[ 1, 'asc' ]],
+				  'columnDefs': [
+					{ orderable: false, targets: [0] }
+				  ]
+				});
+				$datatable.on('draw.dt', function() {
+				  $('checkbox input').iCheck({
+					checkboxClass: 'icheckbox_flat-green'
+				  });
+				});
+
+				TableManageButtons.init();
+				
+			};
+	   
+			/* CHART - MORRIS  */
+		
+		function init_morris_charts() {
+			
+			if( typeof (Morris) === 'undefined'){ return; }
+			console.log('init_morris_charts');
+			
+			if ($('#graph_bar').length){ 
+			
+				Morris.Bar({
+				  element: 'graph_bar',
+				  data: [
+					{device: 'iPhone 4', geekbench: 380},
+					{device: 'iPhone 4S', geekbench: 655},
+					{device: 'iPhone 3GS', geekbench: 275},
+					{device: 'iPhone 5', geekbench: 1571},
+					{device: 'iPhone 5S', geekbench: 655},
+					{device: 'iPhone 6', geekbench: 2154},
+					{device: 'iPhone 6 Plus', geekbench: 1144},
+					{device: 'iPhone 6S', geekbench: 2371},
+					{device: 'iPhone 6S Plus', geekbench: 1471},
+					{device: 'Other', geekbench: 1371}
+				  ],
+				  xkey: 'device',
+				  ykeys: ['geekbench'],
+				  labels: ['Geekbench'],
+				  barRatio: 0.4,
+				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+				  xLabelAngle: 35,
+				  hideHover: 'auto',
+				  resize: true
+				});
+
+			}	
+			
+			if ($('#graph_bar_group').length ){
+			
+				Morris.Bar({
+				  element: 'graph_bar_group',
+				  data: [
+					{"period": "2016-10-01", "licensed": 807, "sorned": 660},
+					{"period": "2016-09-30", "licensed": 1251, "sorned": 729},
+					{"period": "2016-09-29", "licensed": 1769, "sorned": 1018},
+					{"period": "2016-09-20", "licensed": 2246, "sorned": 1461},
+					{"period": "2016-09-19", "licensed": 2657, "sorned": 1967},
+					{"period": "2016-09-18", "licensed": 3148, "sorned": 2627},
+					{"period": "2016-09-17", "licensed": 3471, "sorned": 3740},
+					{"period": "2016-09-16", "licensed": 2871, "sorned": 2216},
+					{"period": "2016-09-15", "licensed": 2401, "sorned": 1656},
+					{"period": "2016-09-10", "licensed": 2115, "sorned": 1022}
+				  ],
+				  xkey: 'period',
+				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+				  ykeys: ['licensed', 'sorned'],
+				  labels: ['Licensed', 'SORN'],
+				  hideHover: 'auto',
+				  xLabelAngle: 60,
+				  resize: true
+				});
+
+			}
+			
+			if ($('#graphx').length ){
+			
+				Morris.Bar({
+				  element: 'graphx',
+				  data: [
+					{x: '2015 Q1', y: 2, z: 3, a: 4},
+					{x: '2015 Q2', y: 3, z: 5, a: 6},
+					{x: '2015 Q3', y: 4, z: 3, a: 2},
+					{x: '2015 Q4', y: 2, z: 4, a: 5}
+				  ],
+				  xkey: 'x',
+				  ykeys: ['y', 'z', 'a'],
+				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+				  hideHover: 'auto',
+				  labels: ['Y', 'Z', 'A'],
+				  resize: true
+				}).on('click', function (i, row) {
+					console.log(i, row);
+				});
+
+			}
+			
+			if ($('#graph_area').length ){
+			
+				Morris.Area({
+				  element: 'graph_area',
+				  data: [
+					{period: '2014 Q1', iphone: 2666, ipad: null, itouch: 2647},
+					{period: '2014 Q2', iphone: 2778, ipad: 2294, itouch: 2441},
+					{period: '2014 Q3', iphone: 4912, ipad: 1969, itouch: 2501},
+					{period: '2014 Q4', iphone: 3767, ipad: 3597, itouch: 5689},
+					{period: '2015 Q1', iphone: 6810, ipad: 1914, itouch: 2293},
+					{period: '2015 Q2', iphone: 5670, ipad: 4293, itouch: 1881},
+					{period: '2015 Q3', iphone: 4820, ipad: 3795, itouch: 1588},
+					{period: '2015 Q4', iphone: 15073, ipad: 5967, itouch: 5175},
+					{period: '2016 Q1', iphone: 10687, ipad: 4460, itouch: 2028},
+					{period: '2016 Q2', iphone: 8432, ipad: 5713, itouch: 1791}
+				  ],
+				  xkey: 'period',
+				  ykeys: ['iphone', 'ipad', 'itouch'],
+				  lineColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+				  labels: ['iPhone', 'iPad', 'iPod Touch'],
+				  pointSize: 2,
+				  hideHover: 'auto',
+				  resize: true
+				});
+
+			}
+			
+			if ($('#graph_donut').length ){
+			
+				Morris.Donut({
+				  element: 'graph_donut',
+				  data: [
+					{label: 'Jam', value: 25},
+					{label: 'Frosted', value: 40},
+					{label: 'Custard', value: 25},
+					{label: 'Sugar', value: 10}
+				  ],
+				  colors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+				  formatter: function (y) {
+					return y + "%";
+				  },
+				  resize: true
+				});
+
+			}
+			
+			if ($('#graph_line').length ){
+			
+				Morris.Line({
+				  element: 'graph_line',
+				  xkey: 'year',
+				  ykeys: ['value'],
+				  labels: ['Value'],
+				  hideHover: 'auto',
+				  lineColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+				  data: [
+					{year: '2012', value: 20},
+					{year: '2013', value: 10},
+					{year: '2014', value: 5},
+					{year: '2015', value: 5},
+					{year: '2016', value: 20}
+				  ],
+				  resize: true
+				});
+
+				$MENU_TOGGLE.on('click', function() {
+				  $(window).resize();
+				});
+			
+			}
+			
+		};
+	   
+		
+		
+		/* ECHRTS */
+	
+		
+		function init_echarts() {
+		
+				if( typeof (echarts) === 'undefined'){ return; }
+				console.log('init_echarts');
+			
+		
+				  var theme = {
+				  color: [
+					  '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+					  '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+				  ],
+
+				  title: {
+					  itemGap: 8,
+					  textStyle: {
+						  fontWeight: 'normal',
+						  color: '#408829'
+					  }
+				  },
+
+				  dataRange: {
+					  color: ['#1f610a', '#97b58d']
+				  },
+
+				  toolbox: {
+					  color: ['#408829', '#408829', '#408829', '#408829']
+				  },
+
+				  tooltip: {
+					  backgroundColor: 'rgba(0,0,0,0.5)',
+					  axisPointer: {
+						  type: 'line',
+						  lineStyle: {
+							  color: '#408829',
+							  type: 'dashed'
+						  },
+						  crossStyle: {
+							  color: '#408829'
+						  },
+						  shadowStyle: {
+							  color: 'rgba(200,200,200,0.3)'
+						  }
+					  }
+				  },
+
+				  dataZoom: {
+					  dataBackgroundColor: '#eee',
+					  fillerColor: 'rgba(64,136,41,0.2)',
+					  handleColor: '#408829'
+				  },
+				  grid: {
+					  borderWidth: 0
+				  },
+
+				  categoryAxis: {
+					  axisLine: {
+						  lineStyle: {
+							  color: '#408829'
+						  }
+					  },
+					  splitLine: {
+						  lineStyle: {
+							  color: ['#eee']
+						  }
+					  }
+				  },
+
+				  valueAxis: {
+					  axisLine: {
+						  lineStyle: {
+							  color: '#408829'
+						  }
+					  },
+					  splitArea: {
+						  show: true,
+						  areaStyle: {
+							  color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+						  }
+					  },
+					  splitLine: {
+						  lineStyle: {
+							  color: ['#eee']
+						  }
+					  }
+				  },
+				  timeline: {
+					  lineStyle: {
+						  color: '#408829'
+					  },
+					  controlStyle: {
+						  normal: {color: '#408829'},
+						  emphasis: {color: '#408829'}
+					  }
+				  },
+
+				  k: {
+					  itemStyle: {
+						  normal: {
+							  color: '#68a54a',
+							  color0: '#a9cba2',
+							  lineStyle: {
+								  width: 1,
+								  color: '#408829',
+								  color0: '#86b379'
+							  }
+						  }
+					  }
+				  },
+				  map: {
+					  itemStyle: {
+						  normal: {
+							  areaStyle: {
+								  color: '#ddd'
+							  },
+							  label: {
+								  textStyle: {
+									  color: '#c12e34'
+								  }
+							  }
+						  },
+						  emphasis: {
+							  areaStyle: {
+								  color: '#99d2dd'
+							  },
+							  label: {
+								  textStyle: {
+									  color: '#c12e34'
+								  }
+							  }
+						  }
+					  }
+				  },
+				  force: {
+					  itemStyle: {
+						  normal: {
+							  linkStyle: {
+								  strokeColor: '#408829'
+							  }
+						  }
+					  }
+				  },
+				  chord: {
+					  padding: 4,
+					  itemStyle: {
+						  normal: {
+							  lineStyle: {
+								  width: 1,
+								  color: 'rgba(128, 128, 128, 0.5)'
+							  },
+							  chordStyle: {
+								  lineStyle: {
+									  width: 1,
+									  color: 'rgba(128, 128, 128, 0.5)'
+								  }
+							  }
+						  },
+						  emphasis: {
+							  lineStyle: {
+								  width: 1,
+								  color: 'rgba(128, 128, 128, 0.5)'
+							  },
+							  chordStyle: {
+								  lineStyle: {
+									  width: 1,
+									  color: 'rgba(128, 128, 128, 0.5)'
+								  }
+							  }
+						  }
+					  }
+				  },
+				  gauge: {
+					  startAngle: 225,
+					  endAngle: -45,
+					  axisLine: {
+						  show: true,
+						  lineStyle: {
+							  color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+							  width: 8
+						  }
+					  },
+					  axisTick: {
+						  splitNumber: 10,
+						  length: 12,
+						  lineStyle: {
+							  color: 'auto'
+						  }
+					  },
+					  axisLabel: {
+						  textStyle: {
+							  color: 'auto'
+						  }
+					  },
+					  splitLine: {
+						  length: 18,
+						  lineStyle: {
+							  color: 'auto'
+						  }
+					  },
+					  pointer: {
+						  length: '90%',
+						  color: 'auto'
+					  },
+					  title: {
+						  textStyle: {
+							  color: '#333'
+						  }
+					  },
+					  detail: {
+						  textStyle: {
+							  color: 'auto'
+						  }
+					  }
+				  },
+				  textStyle: {
+					  fontFamily: 'Arial, Verdana, sans-serif'
+				  }
+			  };
+
+			  
+			  //echart Bar
+			  
+			if ($('#mainb').length ){
+			  
+				  var echartBar = echarts.init(document.getElementById('mainb'), theme);
+
+				  echartBar.setOption({
+					title: {
+					  text: 'Graph title',
+					  subtext: 'Graph Sub-text'
+					},
+					tooltip: {
+					  trigger: 'axis'
+					},
+					legend: {
+					  data: ['sales', 'purchases']
+					},
+					toolbox: {
+					  show: false
+					},
+					calculable: false,
+					xAxis: [{
+					  type: 'category',
+					  data: ['1?', '2?', '3?', '4?', '5?', '6?', '7?', '8?', '9?', '10?', '11?', '12?']
+					}],
+					yAxis: [{
+					  type: 'value'
+					}],
+					series: [{
+					  name: 'sales',
+					  type: 'bar',
+					  data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3],
+					  markPoint: {
+						data: [{
+						  type: 'max',
+						  name: '???'
+						}, {
+						  type: 'min',
+						  name: '???'
+						}]
+					  },
+					  markLine: {
+						data: [{
+						  type: 'average',
+						  name: '???'
+						}]
+					  }
+					}, {
+					  name: 'purchases',
+					  type: 'bar',
+					  data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
+					  markPoint: {
+						data: [{
+						  name: 'sales',
+						  value: 182.2,
+						  xAxis: 7,
+						  yAxis: 183,
+						}, {
+						  name: 'purchases',
+						  value: 2.3,
+						  xAxis: 11,
+						  yAxis: 3
+						}]
+					  },
+					  markLine: {
+						data: [{
+						  type: 'average',
+						  name: '???'
+						}]
+					  }
+					}]
+				  });
+
+			}
+			  
+			  
+			  
+			  
+			   //echart Radar
+			  
+			if ($('#echart_sonar').length ){ 
+			  
+			  var echartRadar = echarts.init(document.getElementById('echart_sonar'), theme);
+
+			  echartRadar.setOption({
+				title: {
+				  text: 'Budget vs spending',
+				  subtext: 'Subtitle'
+				},
+				 tooltip: {
+					trigger: 'item'
+				},
+				legend: {
+				  orient: 'vertical',
+				  x: 'right',
+				  y: 'bottom',
+				  data: ['Allocated Budget', 'Actual Spending']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				polar: [{
+				  indicator: [{
+					text: 'Sales',
+					max: 6000
+				  }, {
+					text: 'Administration',
+					max: 16000
+				  }, {
+					text: 'Information Techology',
+					max: 30000
+				  }, {
+					text: 'Customer Support',
+					max: 38000
+				  }, {
+					text: 'Development',
+					max: 52000
+				  }, {
+					text: 'Marketing',
+					max: 25000
+				  }]
+				}],
+				calculable: true,
+				series: [{
+				  name: 'Budget vs spending',
+				  type: 'radar',
+				  data: [{
+					value: [4300, 10000, 28000, 35000, 50000, 19000],
+					name: 'Allocated Budget'
+				  }, {
+					value: [5000, 14000, 28000, 31000, 42000, 21000],
+					name: 'Actual Spending'
+				  }]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Funnel
+			  
+			if ($('#echart_pyramid').length ){ 
+			  
+			  var echartFunnel = echarts.init(document.getElementById('echart_pyramid'), theme);
+
+			  echartFunnel.setOption({
+				title: {
+				  text: 'Echart Pyramid Graph',
+				  subtext: 'Subtitle'
+				},
+				tooltip: {
+				  trigger: 'item',
+				  formatter: "{a} <br/>{b} : {c}%"
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				legend: {
+				  data: ['Something #1', 'Something #2', 'Something #3', 'Something #4', 'Something #5'],
+				  orient: 'vertical',
+				  x: 'left',
+				  y: 'bottom'
+				},
+				calculable: true,
+				series: [{
+				  name: '漏斗图',
+				  type: 'funnel',
+				  width: '40%',
+				  data: [{
+					value: 60,
+					name: 'Something #1'
+				  }, {
+					value: 40,
+					name: 'Something #2'
+				  }, {
+					value: 20,
+					name: 'Something #3'
+				  }, {
+					value: 80,
+					name: 'Something #4'
+				  }, {
+					value: 100,
+					name: 'Something #5'
+				  }]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Gauge
+			  
+			if ($('#echart_gauge').length ){ 
+			  
+			  var echartGauge = echarts.init(document.getElementById('echart_gauge'), theme);
+
+			  echartGauge.setOption({
+				tooltip: {
+				  formatter: "{a} <br/>{b} : {c}%"
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				series: [{
+				  name: 'Performance',
+				  type: 'gauge',
+				  center: ['50%', '50%'],
+				  startAngle: 140,
+				  endAngle: -140,
+				  min: 0,
+				  max: 100,
+				  precision: 0,
+				  splitNumber: 10,
+				  axisLine: {
+					show: true,
+					lineStyle: {
+					  color: [
+						[0.2, 'lightgreen'],
+						[0.4, 'orange'],
+						[0.8, 'skyblue'],
+						[1, '#ff4500']
+					  ],
+					  width: 30
+					}
+				  },
+				  axisTick: {
+					show: true,
+					splitNumber: 5,
+					length: 8,
+					lineStyle: {
+					  color: '#eee',
+					  width: 1,
+					  type: 'solid'
+					}
+				  },
+				  axisLabel: {
+					show: true,
+					formatter: function(v) {
+					  switch (v + '') {
+						case '10':
+						  return 'a';
+						case '30':
+						  return 'b';
+						case '60':
+						  return 'c';
+						case '90':
+						  return 'd';
+						default:
+						  return '';
+					  }
+					},
+					textStyle: {
+					  color: '#333'
+					}
+				  },
+				  splitLine: {
+					show: true,
+					length: 30,
+					lineStyle: {
+					  color: '#eee',
+					  width: 2,
+					  type: 'solid'
+					}
+				  },
+				  pointer: {
+					length: '80%',
+					width: 8,
+					color: 'auto'
+				  },
+				  title: {
+					show: true,
+					offsetCenter: ['-65%', -10],
+					textStyle: {
+					  color: '#333',
+					  fontSize: 15
+					}
+				  },
+				  detail: {
+					show: true,
+					backgroundColor: 'rgba(0,0,0,0)',
+					borderWidth: 0,
+					borderColor: '#ccc',
+					width: 100,
+					height: 40,
+					offsetCenter: ['-60%', 10],
+					formatter: '{value}%',
+					textStyle: {
+					  color: 'auto',
+					  fontSize: 30
+					}
+				  },
+				  data: [{
+					value: 50,
+					name: 'Performance'
+				  }]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Line
+			  
+			if ($('#echart_line').length ){ 
+			  
+			  var echartLine = echarts.init(document.getElementById('echart_line'), theme);
+
+			  echartLine.setOption({
+				title: {
+				  text: 'Line Graph',
+				  subtext: 'Subtitle'
+				},
+				tooltip: {
+				  trigger: 'axis'
+				},
+				legend: {
+				  x: 220,
+				  y: 40,
+				  data: ['Intent', 'Pre-order', 'Deal']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					magicType: {
+					  show: true,
+					  title: {
+						line: 'Line',
+						bar: 'Bar',
+						stack: 'Stack',
+						tiled: 'Tiled'
+					  },
+					  type: ['line', 'bar', 'stack', 'tiled']
+					},
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				calculable: true,
+				xAxis: [{
+				  type: 'category',
+				  boundaryGap: false,
+				  data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+				}],
+				yAxis: [{
+				  type: 'value'
+				}],
+				series: [{
+				  name: 'Deal',
+				  type: 'line',
+				  smooth: true,
+				  itemStyle: {
+					normal: {
+					  areaStyle: {
+						type: 'default'
+					  }
+					}
+				  },
+				  data: [10, 12, 21, 54, 260, 830, 710]
+				}, {
+				  name: 'Pre-order',
+				  type: 'line',
+				  smooth: true,
+				  itemStyle: {
+					normal: {
+					  areaStyle: {
+						type: 'default'
+					  }
+					}
+				  },
+				  data: [30, 182, 434, 791, 390, 30, 10]
+				}, {
+				  name: 'Intent',
+				  type: 'line',
+				  smooth: true,
+				  itemStyle: {
+					normal: {
+					  areaStyle: {
+						type: 'default'
+					  }
+					}
+				  },
+				  data: [1320, 1132, 601, 234, 120, 90, 20]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Scatter
+			  
+			if ($('#echart_scatter').length ){ 
+			  
+			  var echartScatter = echarts.init(document.getElementById('echart_scatter'), theme);
+
+			  echartScatter.setOption({
+				title: {
+				  text: 'Scatter Graph',
+				  subtext: 'Heinz  2003'
+				},
+				tooltip: {
+				  trigger: 'axis',
+				  showDelay: 0,
+				  axisPointer: {
+					type: 'cross',
+					lineStyle: {
+					  type: 'dashed',
+					  width: 1
+					}
+				  }
+				},
+				legend: {
+				  data: ['Data2', 'Data1']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				xAxis: [{
+				  type: 'value',
+				  scale: true,
+				  axisLabel: {
+					formatter: '{value} cm'
+				  }
+				}],
+				yAxis: [{
+				  type: 'value',
+				  scale: true,
+				  axisLabel: {
+					formatter: '{value} kg'
+				  }
+				}],
+				series: [{
+				  name: 'Data1',
+				  type: 'scatter',
+				  tooltip: {
+					trigger: 'item',
+					formatter: function(params) {
+					  if (params.value.length > 1) {
+						return params.seriesName + ' :<br/>' + params.value[0] + 'cm ' + params.value[1] + 'kg ';
+					  } else {
+						return params.seriesName + ' :<br/>' + params.name + ' : ' + params.value + 'kg ';
+					  }
+					}
+				  },
+				  data: [
+					[161.2, 51.6],
+					[167.5, 59.0],
+					[159.5, 49.2],
+					[157.0, 63.0],
+					[155.8, 53.6],
+					[170.0, 59.0],
+					[159.1, 47.6],
+					[166.0, 69.8],
+					[176.2, 66.8],
+					[160.2, 75.2],
+					[172.5, 55.2],
+					[170.9, 54.2],
+					[172.9, 62.5],
+					[153.4, 42.0],
+					[160.0, 50.0],
+					[147.2, 49.8],
+					[168.2, 49.2],
+					[175.0, 73.2],
+					[157.0, 47.8],
+					[167.6, 68.8],
+					[159.5, 50.6],
+					[175.0, 82.5],
+					[166.8, 57.2],
+					[176.5, 87.8],
+					[170.2, 72.8],
+					[174.0, 54.5],
+					[173.0, 59.8],
+					[179.9, 67.3],
+					[170.5, 67.8],
+					[160.0, 47.0],
+					[154.4, 46.2],
+					[162.0, 55.0],
+					[176.5, 83.0],
+					[160.0, 54.4],
+					[152.0, 45.8],
+					[162.1, 53.6],
+					[170.0, 73.2],
+					[160.2, 52.1],
+					[161.3, 67.9],
+					[166.4, 56.6],
+					[168.9, 62.3],
+					[163.8, 58.5],
+					[167.6, 54.5],
+					[160.0, 50.2],
+					[161.3, 60.3],
+					[167.6, 58.3],
+					[165.1, 56.2],
+					[160.0, 50.2],
+					[170.0, 72.9],
+					[157.5, 59.8],
+					[167.6, 61.0],
+					[160.7, 69.1],
+					[163.2, 55.9],
+					[152.4, 46.5],
+					[157.5, 54.3],
+					[168.3, 54.8],
+					[180.3, 60.7],
+					[165.5, 60.0],
+					[165.0, 62.0],
+					[164.5, 60.3],
+					[156.0, 52.7],
+					[160.0, 74.3],
+					[163.0, 62.0],
+					[165.7, 73.1],
+					[161.0, 80.0],
+					[162.0, 54.7],
+					[166.0, 53.2],
+					[174.0, 75.7],
+					[172.7, 61.1],
+					[167.6, 55.7],
+					[151.1, 48.7],
+					[164.5, 52.3],
+					[163.5, 50.0],
+					[152.0, 59.3],
+					[169.0, 62.5],
+					[164.0, 55.7],
+					[161.2, 54.8],
+					[155.0, 45.9],
+					[170.0, 70.6],
+					[176.2, 67.2],
+					[170.0, 69.4],
+					[162.5, 58.2],
+					[170.3, 64.8],
+					[164.1, 71.6],
+					[169.5, 52.8],
+					[163.2, 59.8],
+					[154.5, 49.0],
+					[159.8, 50.0],
+					[173.2, 69.2],
+					[170.0, 55.9],
+					[161.4, 63.4],
+					[169.0, 58.2],
+					[166.2, 58.6],
+					[159.4, 45.7],
+					[162.5, 52.2],
+					[159.0, 48.6],
+					[162.8, 57.8],
+					[159.0, 55.6],
+					[179.8, 66.8],
+					[162.9, 59.4],
+					[161.0, 53.6],
+					[151.1, 73.2],
+					[168.2, 53.4],
+					[168.9, 69.0],
+					[173.2, 58.4],
+					[171.8, 56.2],
+					[178.0, 70.6],
+					[164.3, 59.8],
+					[163.0, 72.0],
+					[168.5, 65.2],
+					[166.8, 56.6],
+					[172.7, 105.2],
+					[163.5, 51.8],
+					[169.4, 63.4],
+					[167.8, 59.0],
+					[159.5, 47.6],
+					[167.6, 63.0],
+					[161.2, 55.2],
+					[160.0, 45.0],
+					[163.2, 54.0],
+					[162.2, 50.2],
+					[161.3, 60.2],
+					[149.5, 44.8],
+					[157.5, 58.8],
+					[163.2, 56.4],
+					[172.7, 62.0],
+					[155.0, 49.2],
+					[156.5, 67.2],
+					[164.0, 53.8],
+					[160.9, 54.4],
+					[162.8, 58.0],
+					[167.0, 59.8],
+					[160.0, 54.8],
+					[160.0, 43.2],
+					[168.9, 60.5],
+					[158.2, 46.4],
+					[156.0, 64.4],
+					[160.0, 48.8],
+					[167.1, 62.2],
+					[158.0, 55.5],
+					[167.6, 57.8],
+					[156.0, 54.6],
+					[162.1, 59.2],
+					[173.4, 52.7],
+					[159.8, 53.2],
+					[170.5, 64.5],
+					[159.2, 51.8],
+					[157.5, 56.0],
+					[161.3, 63.6],
+					[162.6, 63.2],
+					[160.0, 59.5],
+					[168.9, 56.8],
+					[165.1, 64.1],
+					[162.6, 50.0],
+					[165.1, 72.3],
+					[166.4, 55.0],
+					[160.0, 55.9],
+					[152.4, 60.4],
+					[170.2, 69.1],
+					[162.6, 84.5],
+					[170.2, 55.9],
+					[158.8, 55.5],
+					[172.7, 69.5],
+					[167.6, 76.4],
+					[162.6, 61.4],
+					[167.6, 65.9],
+					[156.2, 58.6],
+					[175.2, 66.8],
+					[172.1, 56.6],
+					[162.6, 58.6],
+					[160.0, 55.9],
+					[165.1, 59.1],
+					[182.9, 81.8],
+					[166.4, 70.7],
+					[165.1, 56.8],
+					[177.8, 60.0],
+					[165.1, 58.2],
+					[175.3, 72.7],
+					[154.9, 54.1],
+					[158.8, 49.1],
+					[172.7, 75.9],
+					[168.9, 55.0],
+					[161.3, 57.3],
+					[167.6, 55.0],
+					[165.1, 65.5],
+					[175.3, 65.5],
+					[157.5, 48.6],
+					[163.8, 58.6],
+					[167.6, 63.6],
+					[165.1, 55.2],
+					[165.1, 62.7],
+					[168.9, 56.6],
+					[162.6, 53.9],
+					[164.5, 63.2],
+					[176.5, 73.6],
+					[168.9, 62.0],
+					[175.3, 63.6],
+					[159.4, 53.2],
+					[160.0, 53.4],
+					[170.2, 55.0],
+					[162.6, 70.5],
+					[167.6, 54.5],
+					[162.6, 54.5],
+					[160.7, 55.9],
+					[160.0, 59.0],
+					[157.5, 63.6],
+					[162.6, 54.5],
+					[152.4, 47.3],
+					[170.2, 67.7],
+					[165.1, 80.9],
+					[172.7, 70.5],
+					[165.1, 60.9],
+					[170.2, 63.6],
+					[170.2, 54.5],
+					[170.2, 59.1],
+					[161.3, 70.5],
+					[167.6, 52.7],
+					[167.6, 62.7],
+					[165.1, 86.3],
+					[162.6, 66.4],
+					[152.4, 67.3],
+					[168.9, 63.0],
+					[170.2, 73.6],
+					[175.2, 62.3],
+					[175.2, 57.7],
+					[160.0, 55.4],
+					[165.1, 104.1],
+					[174.0, 55.5],
+					[170.2, 77.3],
+					[160.0, 80.5],
+					[167.6, 64.5],
+					[167.6, 72.3],
+					[167.6, 61.4],
+					[154.9, 58.2],
+					[162.6, 81.8],
+					[175.3, 63.6],
+					[171.4, 53.4],
+					[157.5, 54.5],
+					[165.1, 53.6],
+					[160.0, 60.0],
+					[174.0, 73.6],
+					[162.6, 61.4],
+					[174.0, 55.5],
+					[162.6, 63.6],
+					[161.3, 60.9],
+					[156.2, 60.0],
+					[149.9, 46.8],
+					[169.5, 57.3],
+					[160.0, 64.1],
+					[175.3, 63.6],
+					[169.5, 67.3],
+					[160.0, 75.5],
+					[172.7, 68.2],
+					[162.6, 61.4],
+					[157.5, 76.8],
+					[176.5, 71.8],
+					[164.4, 55.5],
+					[160.7, 48.6],
+					[174.0, 66.4],
+					[163.8, 67.3]
+				  ],
+				  markPoint: {
+					data: [{
+					  type: 'max',
+					  name: 'Max'
+					}, {
+					  type: 'min',
+					  name: 'Min'
+					}]
+				  },
+				  markLine: {
+					data: [{
+					  type: 'average',
+					  name: 'Mean'
+					}]
+				  }
+				}, {
+				  name: 'Data2',
+				  type: 'scatter',
+				  tooltip: {
+					trigger: 'item',
+					formatter: function(params) {
+					  if (params.value.length > 1) {
+						return params.seriesName + ' :<br/>' + params.value[0] + 'cm ' + params.value[1] + 'kg ';
+					  } else {
+						return params.seriesName + ' :<br/>' + params.name + ' : ' + params.value + 'kg ';
+					  }
+					}
+				  },
+				  data: [
+					[174.0, 65.6],
+					[175.3, 71.8],
+					[193.5, 80.7],
+					[186.5, 72.6],
+					[187.2, 78.8],
+					[181.5, 74.8],
+					[184.0, 86.4],
+					[184.5, 78.4],
+					[175.0, 62.0],
+					[184.0, 81.6],
+					[180.0, 76.6],
+					[177.8, 83.6],
+					[192.0, 90.0],
+					[176.0, 74.6],
+					[174.0, 71.0],
+					[184.0, 79.6],
+					[192.7, 93.8],
+					[171.5, 70.0],
+					[173.0, 72.4],
+					[176.0, 85.9],
+					[176.0, 78.8],
+					[180.5, 77.8],
+					[172.7, 66.2],
+					[176.0, 86.4],
+					[173.5, 81.8],
+					[178.0, 89.6],
+					[180.3, 82.8],
+					[180.3, 76.4],
+					[164.5, 63.2],
+					[173.0, 60.9],
+					[183.5, 74.8],
+					[175.5, 70.0],
+					[188.0, 72.4],
+					[189.2, 84.1],
+					[172.8, 69.1],
+					[170.0, 59.5],
+					[182.0, 67.2],
+					[170.0, 61.3],
+					[177.8, 68.6],
+					[184.2, 80.1],
+					[186.7, 87.8],
+					[171.4, 84.7],
+					[172.7, 73.4],
+					[175.3, 72.1],
+					[180.3, 82.6],
+					[182.9, 88.7],
+					[188.0, 84.1],
+					[177.2, 94.1],
+					[172.1, 74.9],
+					[167.0, 59.1],
+					[169.5, 75.6],
+					[174.0, 86.2],
+					[172.7, 75.3],
+					[182.2, 87.1],
+					[164.1, 55.2],
+					[163.0, 57.0],
+					[171.5, 61.4],
+					[184.2, 76.8],
+					[174.0, 86.8],
+					[174.0, 72.2],
+					[177.0, 71.6],
+					[186.0, 84.8],
+					[167.0, 68.2],
+					[171.8, 66.1],
+					[182.0, 72.0],
+					[167.0, 64.6],
+					[177.8, 74.8],
+					[164.5, 70.0],
+					[192.0, 101.6],
+					[175.5, 63.2],
+					[171.2, 79.1],
+					[181.6, 78.9],
+					[167.4, 67.7],
+					[181.1, 66.0],
+					[177.0, 68.2],
+					[174.5, 63.9],
+					[177.5, 72.0],
+					[170.5, 56.8],
+					[182.4, 74.5],
+					[197.1, 90.9],
+					[180.1, 93.0],
+					[175.5, 80.9],
+					[180.6, 72.7],
+					[184.4, 68.0],
+					[175.5, 70.9],
+					[180.6, 72.5],
+					[177.0, 72.5],
+					[177.1, 83.4],
+					[181.6, 75.5],
+					[176.5, 73.0],
+					[175.0, 70.2],
+					[174.0, 73.4],
+					[165.1, 70.5],
+					[177.0, 68.9],
+					[192.0, 102.3],
+					[176.5, 68.4],
+					[169.4, 65.9],
+					[182.1, 75.7],
+					[179.8, 84.5],
+					[175.3, 87.7],
+					[184.9, 86.4],
+					[177.3, 73.2],
+					[167.4, 53.9],
+					[178.1, 72.0],
+					[168.9, 55.5],
+					[157.2, 58.4],
+					[180.3, 83.2],
+					[170.2, 72.7],
+					[177.8, 64.1],
+					[172.7, 72.3],
+					[165.1, 65.0],
+					[186.7, 86.4],
+					[165.1, 65.0],
+					[174.0, 88.6],
+					[175.3, 84.1],
+					[185.4, 66.8],
+					[177.8, 75.5],
+					[180.3, 93.2],
+					[180.3, 82.7],
+					[177.8, 58.0],
+					[177.8, 79.5],
+					[177.8, 78.6],
+					[177.8, 71.8],
+					[177.8, 116.4],
+					[163.8, 72.2],
+					[188.0, 83.6],
+					[198.1, 85.5],
+					[175.3, 90.9],
+					[166.4, 85.9],
+					[190.5, 89.1],
+					[166.4, 75.0],
+					[177.8, 77.7],
+					[179.7, 86.4],
+					[172.7, 90.9],
+					[190.5, 73.6],
+					[185.4, 76.4],
+					[168.9, 69.1],
+					[167.6, 84.5],
+					[175.3, 64.5],
+					[170.2, 69.1],
+					[190.5, 108.6],
+					[177.8, 86.4],
+					[190.5, 80.9],
+					[177.8, 87.7],
+					[184.2, 94.5],
+					[176.5, 80.2],
+					[177.8, 72.0],
+					[180.3, 71.4],
+					[171.4, 72.7],
+					[172.7, 84.1],
+					[172.7, 76.8],
+					[177.8, 63.6],
+					[177.8, 80.9],
+					[182.9, 80.9],
+					[170.2, 85.5],
+					[167.6, 68.6],
+					[175.3, 67.7],
+					[165.1, 66.4],
+					[185.4, 102.3],
+					[181.6, 70.5],
+					[172.7, 95.9],
+					[190.5, 84.1],
+					[179.1, 87.3],
+					[175.3, 71.8],
+					[170.2, 65.9],
+					[193.0, 95.9],
+					[171.4, 91.4],
+					[177.8, 81.8],
+					[177.8, 96.8],
+					[167.6, 69.1],
+					[167.6, 82.7],
+					[180.3, 75.5],
+					[182.9, 79.5],
+					[176.5, 73.6],
+					[186.7, 91.8],
+					[188.0, 84.1],
+					[188.0, 85.9],
+					[177.8, 81.8],
+					[174.0, 82.5],
+					[177.8, 80.5],
+					[171.4, 70.0],
+					[185.4, 81.8],
+					[185.4, 84.1],
+					[188.0, 90.5],
+					[188.0, 91.4],
+					[182.9, 89.1],
+					[176.5, 85.0],
+					[175.3, 69.1],
+					[175.3, 73.6],
+					[188.0, 80.5],
+					[188.0, 82.7],
+					[175.3, 86.4],
+					[170.5, 67.7],
+					[179.1, 92.7],
+					[177.8, 93.6],
+					[175.3, 70.9],
+					[182.9, 75.0],
+					[170.8, 93.2],
+					[188.0, 93.2],
+					[180.3, 77.7],
+					[177.8, 61.4],
+					[185.4, 94.1],
+					[168.9, 75.0],
+					[185.4, 83.6],
+					[180.3, 85.5],
+					[174.0, 73.9],
+					[167.6, 66.8],
+					[182.9, 87.3],
+					[160.0, 72.3],
+					[180.3, 88.6],
+					[167.6, 75.5],
+					[186.7, 101.4],
+					[175.3, 91.1],
+					[175.3, 67.3],
+					[175.9, 77.7],
+					[175.3, 81.8],
+					[179.1, 75.5],
+					[181.6, 84.5],
+					[177.8, 76.6],
+					[182.9, 85.0],
+					[177.8, 102.5],
+					[184.2, 77.3],
+					[179.1, 71.8],
+					[176.5, 87.9],
+					[188.0, 94.3],
+					[174.0, 70.9],
+					[167.6, 64.5],
+					[170.2, 77.3],
+					[167.6, 72.3],
+					[188.0, 87.3],
+					[174.0, 80.0],
+					[176.5, 82.3],
+					[180.3, 73.6],
+					[167.6, 74.1],
+					[188.0, 85.9],
+					[180.3, 73.2],
+					[167.6, 76.3],
+					[183.0, 65.9],
+					[183.0, 90.9],
+					[179.1, 89.1],
+					[170.2, 62.3],
+					[177.8, 82.7],
+					[179.1, 79.1],
+					[190.5, 98.2],
+					[177.8, 84.1],
+					[180.3, 83.2],
+					[180.3, 83.2]
+				  ],
+				  markPoint: {
+					data: [{
+					  type: 'max',
+					  name: 'Max'
+					}, {
+					  type: 'min',
+					  name: 'Min'
+					}]
+				  },
+				  markLine: {
+					data: [{
+					  type: 'average',
+					  name: 'Mean'
+					}]
+				  }
+				}]
+			  });
+
+			} 
+			  
+			   //echart Bar Horizontal
+			  
+			if ($('#echart_bar_horizontal').length ){ 
+			  
+			  var echartBar = echarts.init(document.getElementById('echart_bar_horizontal'), theme);
+
+			  echartBar.setOption({
+				title: {
+				  text: 'Bar Graph',
+				  subtext: 'Graph subtitle'
+				},
+				tooltip: {
+				  trigger: 'axis'
+				},
+				legend: {
+				  x: 100,
+				  data: ['2015', '2016']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				calculable: true,
+				xAxis: [{
+				  type: 'value',
+				  boundaryGap: [0, 0.01]
+				}],
+				yAxis: [{
+				  type: 'category',
+				  data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+				}],
+				series: [{
+				  name: '2015',
+				  type: 'bar',
+				  data: [18203, 23489, 29034, 104970, 131744, 630230]
+				}, {
+				  name: '2016',
+				  type: 'bar',
+				  data: [19325, 23438, 31000, 121594, 134141, 681807]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Pie Collapse
+			  
+			if ($('#echart_pie2').length ){ 
+			  
+			  var echartPieCollapse = echarts.init(document.getElementById('echart_pie2'), theme);
+			  
+			  echartPieCollapse.setOption({
+				tooltip: {
+				  trigger: 'item',
+				  formatter: "{a} <br/>{b} : {c} ({d}%)"
+				},
+				legend: {
+				  x: 'center',
+				  y: 'bottom',
+				  data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					magicType: {
+					  show: true,
+					  type: ['pie', 'funnel']
+					},
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				calculable: true,
+				series: [{
+				  name: 'Area Mode',
+				  type: 'pie',
+				  radius: [25, 90],
+				  center: ['50%', 170],
+				  roseType: 'area',
+				  x: '50%',
+				  max: 40,
+				  sort: 'ascending',
+				  data: [{
+					value: 10,
+					name: 'rose1'
+				  }, {
+					value: 5,
+					name: 'rose2'
+				  }, {
+					value: 15,
+					name: 'rose3'
+				  }, {
+					value: 25,
+					name: 'rose4'
+				  }, {
+					value: 20,
+					name: 'rose5'
+				  }, {
+					value: 35,
+					name: 'rose6'
+				  }]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Donut
+			  
+			if ($('#echart_donut').length ){  
+			  
+			  var echartDonut = echarts.init(document.getElementById('echart_donut'), theme);
+			  
+			  echartDonut.setOption({
+				tooltip: {
+				  trigger: 'item',
+				  formatter: "{a} <br/>{b} : {c} ({d}%)"
+				},
+				calculable: true,
+				legend: {
+				  x: 'center',
+				  y: 'bottom',
+				  data: ['Direct Access', 'E-mail Marketing', 'Union Ad', 'Video Ads', 'Search Engine']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					magicType: {
+					  show: true,
+					  type: ['pie', 'funnel'],
+					  option: {
+						funnel: {
+						  x: '25%',
+						  width: '50%',
+						  funnelAlign: 'center',
+						  max: 1548
+						}
+					  }
+					},
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				series: [{
+				  name: 'Access to the resource',
+				  type: 'pie',
+				  radius: ['35%', '55%'],
+				  itemStyle: {
+					normal: {
+					  label: {
+						show: true
+					  },
+					  labelLine: {
+						show: true
+					  }
+					},
+					emphasis: {
+					  label: {
+						show: true,
+						position: 'center',
+						textStyle: {
+						  fontSize: '14',
+						  fontWeight: 'normal'
+						}
+					  }
+					}
+				  },
+				  data: [{
+					value: 335,
+					name: 'Direct Access'
+				  }, {
+					value: 310,
+					name: 'E-mail Marketing'
+				  }, {
+					value: 234,
+					name: 'Union Ad'
+				  }, {
+					value: 135,
+					name: 'Video Ads'
+				  }, {
+					value: 1548,
+					name: 'Search Engine'
+				  }]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Pie
+			  
+			if ($('#echart_pie').length ){  
+			  
+			  var echartPie = echarts.init(document.getElementById('echart_pie'), theme);
+
+			  echartPie.setOption({
+				tooltip: {
+				  trigger: 'item',
+				  formatter: "{a} <br/>{b} : {c} ({d}%)"
+				},
+				legend: {
+				  x: 'center',
+				  y: 'bottom',
+				  data: ['Direct Access', 'E-mail Marketing', 'Union Ad', 'Video Ads', 'Search Engine']
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					magicType: {
+					  show: true,
+					  type: ['pie', 'funnel'],
+					  option: {
+						funnel: {
+						  x: '25%',
+						  width: '50%',
+						  funnelAlign: 'left',
+						  max: 1548
+						}
+					  }
+					},
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				calculable: true,
+				series: [{
+				  name: '访问来源',
+				  type: 'pie',
+				  radius: '55%',
+				  center: ['50%', '48%'],
+				  data: [{
+					value: 335,
+					name: 'Direct Access'
+				  }, {
+					value: 310,
+					name: 'E-mail Marketing'
+				  }, {
+					value: 234,
+					name: 'Union Ad'
+				  }, {
+					value: 135,
+					name: 'Video Ads'
+				  }, {
+					value: 1548,
+					name: 'Search Engine'
+				  }]
+				}]
+			  });
+
+			  var dataStyle = {
+				normal: {
+				  label: {
+					show: false
+				  },
+				  labelLine: {
+					show: false
+				  }
+				}
+			  };
+
+			  var placeHolderStyle = {
+				normal: {
+				  color: 'rgba(0,0,0,0)',
+				  label: {
+					show: false
+				  },
+				  labelLine: {
+					show: false
+				  }
+				},
+				emphasis: {
+				  color: 'rgba(0,0,0,0)'
+				}
+			  };
+
+			} 
+			  
+			   //echart Mini Pie
+			  
+			if ($('#echart_mini_pie').length ){ 
+			  
+			  var echartMiniPie = echarts.init(document.getElementById('echart_mini_pie'), theme);
+
+			  echartMiniPie .setOption({
+				title: {
+				  text: 'Chart #2',
+				  subtext: 'From ExcelHome',
+				  sublink: 'http://e.weibo.com/1341556070/AhQXtjbqh',
+				  x: 'center',
+				  y: 'center',
+				  itemGap: 20,
+				  textStyle: {
+					color: 'rgba(30,144,255,0.8)',
+					fontFamily: '微软雅黑',
+					fontSize: 35,
+					fontWeight: 'bolder'
+				  }
+				},
+				tooltip: {
+				  show: true,
+				  formatter: "{a} <br/>{b} : {c} ({d}%)"
+				},
+				legend: {
+				  orient: 'vertical',
+				  x: 170,
+				  y: 45,
+				  itemGap: 12,
+				  data: ['68%Something #1', '29%Something #2', '3%Something #3'],
+				},
+				toolbox: {
+				  show: true,
+				  feature: {
+					mark: {
+					  show: true
+					},
+					dataView: {
+					  show: true,
+					  title: "Text View",
+					  lang: [
+						"Text View",
+						"Close",
+						"Refresh",
+					  ],
+					  readOnly: false
+					},
+					restore: {
+					  show: true,
+					  title: "Restore"
+					},
+					saveAsImage: {
+					  show: true,
+					  title: "Save Image"
+					}
+				  }
+				},
+				series: [{
+				  name: '1',
+				  type: 'pie',
+				  clockWise: false,
+				  radius: [105, 130],
+				  itemStyle: dataStyle,
+				  data: [{
+					value: 68,
+					name: '68%Something #1'
+				  }, {
+					value: 32,
+					name: 'invisible',
+					itemStyle: placeHolderStyle
+				  }]
+				}, {
+				  name: '2',
+				  type: 'pie',
+				  clockWise: false,
+				  radius: [80, 105],
+				  itemStyle: dataStyle,
+				  data: [{
+					value: 29,
+					name: '29%Something #2'
+				  }, {
+					value: 71,
+					name: 'invisible',
+					itemStyle: placeHolderStyle
+				  }]
+				}, {
+				  name: '3',
+				  type: 'pie',
+				  clockWise: false,
+				  radius: [25, 80],
+				  itemStyle: dataStyle,
+				  data: [{
+					value: 3,
+					name: '3%Something #3'
+				  }, {
+					value: 97,
+					name: 'invisible',
+					itemStyle: placeHolderStyle
+				  }]
+				}]
+			  });
+
+			} 
+			  
+			   //echart Map
+			  
+			if ($('#echart_world_map').length ){ 
+			  
+				  var echartMap = echarts.init(document.getElementById('echart_world_map'), theme);
+				  
+				   
+				  echartMap.setOption({
+					title: {
+					  text: 'World Population (2010)',
+					  subtext: 'from United Nations, Total population, both sexes combined, as of 1 July (thousands)',
+					  x: 'center',
+					  y: 'top'
+					},
+					tooltip: {
+					  trigger: 'item',
+					  formatter: function(params) {
+						var value = (params.value + '').split('.');
+						value = value[0].replace(/(\d{1,3})(?=(?:\d{3})+(?!\d))/g, '$1,') + '.' + value[1];
+						return params.seriesName + '<br/>' + params.name + ' : ' + value;
+					  }
+					},
+					toolbox: {
+					  show: true,
+					  orient: 'vertical',
+					  x: 'right',
+					  y: 'center',
+					  feature: {
+						mark: {
+						  show: true
+						},
+						dataView: {
+						  show: true,
+						  title: "Text View",
+						  lang: [
+							"Text View",
+							"Close",
+							"Refresh",
+						  ],
+						  readOnly: false
+						},
+						restore: {
+						  show: true,
+						  title: "Restore"
+						},
+						saveAsImage: {
+						  show: true,
+						  title: "Save Image"
+						}
+					  }
+					},
+					dataRange: {
+					  min: 0,
+					  max: 1000000,
+					  text: ['High', 'Low'],
+					  realtime: false,
+					  calculable: true,
+					  color: ['#087E65', '#26B99A', '#CBEAE3']
+					},
+					series: [{
+					  name: 'World Population (2010)',
+					  type: 'map',
+					  mapType: 'world',
+					  roam: false,
+					  mapLocation: {
+						y: 60
+					  },
+					  itemStyle: {
+						emphasis: {
+						  label: {
+							show: true
+						  }
+						}
+					  },
+					  data: [{
+						name: 'Afghanistan',
+						value: 28397.812
+					  }, {
+						name: 'Angola',
+						value: 19549.124
+					  }, {
+						name: 'Albania',
+						value: 3150.143
+					  }, {
+						name: 'United Arab Emirates',
+						value: 8441.537
+					  }, {
+						name: 'Argentina',
+						value: 40374.224
+					  }, {
+						name: 'Armenia',
+						value: 2963.496
+					  }, {
+						name: 'French Southern and Antarctic Lands',
+						value: 268.065
+					  }, {
+						name: 'Australia',
+						value: 22404.488
+					  }, {
+						name: 'Austria',
+						value: 8401.924
+					  }, {
+						name: 'Azerbaijan',
+						value: 9094.718
+					  }, {
+						name: 'Burundi',
+						value: 9232.753
+					  }, {
+						name: 'Belgium',
+						value: 10941.288
+					  }, {
+						name: 'Benin',
+						value: 9509.798
+					  }, {
+						name: 'Burkina Faso',
+						value: 15540.284
+					  }, {
+						name: 'Bangladesh',
+						value: 151125.475
+					  }, {
+						name: 'Bulgaria',
+						value: 7389.175
+					  }, {
+						name: 'The Bahamas',
+						value: 66402.316
+					  }, {
+						name: 'Bosnia and Herzegovina',
+						value: 3845.929
+					  }, {
+						name: 'Belarus',
+						value: 9491.07
+					  }, {
+						name: 'Belize',
+						value: 308.595
+					  }, {
+						name: 'Bermuda',
+						value: 64.951
+					  }, {
+						name: 'Bolivia',
+						value: 716.939
+					  }, {
+						name: 'Brazil',
+						value: 195210.154
+					  }, {
+						name: 'Brunei',
+						value: 27.223
+					  }, {
+						name: 'Bhutan',
+						value: 716.939
+					  }, {
+						name: 'Botswana',
+						value: 1969.341
+					  }, {
+						name: 'Central African Republic',
+						value: 4349.921
+					  }, {
+						name: 'Canada',
+						value: 34126.24
+					  }, {
+						name: 'Switzerland',
+						value: 7830.534
+					  }, {
+						name: 'Chile',
+						value: 17150.76
+					  }, {
+						name: 'China',
+						value: 1359821.465
+					  }, {
+						name: 'Ivory Coast',
+						value: 60508.978
+					  }, {
+						name: 'Cameroon',
+						value: 20624.343
+					  }, {
+						name: 'Democratic Republic of the Congo',
+						value: 62191.161
+					  }, {
+						name: 'Republic of the Congo',
+						value: 3573.024
+					  }, {
+						name: 'Colombia',
+						value: 46444.798
+					  }, {
+						name: 'Costa Rica',
+						value: 4669.685
+					  }, {
+						name: 'Cuba',
+						value: 11281.768
+					  }, {
+						name: 'Northern Cyprus',
+						value: 1.468
+					  }, {
+						name: 'Cyprus',
+						value: 1103.685
+					  }, {
+						name: 'Czech Republic',
+						value: 10553.701
+					  }, {
+						name: 'Germany',
+						value: 83017.404
+					  }, {
+						name: 'Djibouti',
+						value: 834.036
+					  }, {
+						name: 'Denmark',
+						value: 5550.959
+					  }, {
+						name: 'Dominican Republic',
+						value: 10016.797
+					  }, {
+						name: 'Algeria',
+						value: 37062.82
+					  }, {
+						name: 'Ecuador',
+						value: 15001.072
+					  }, {
+						name: 'Egypt',
+						value: 78075.705
+					  }, {
+						name: 'Eritrea',
+						value: 5741.159
+					  }, {
+						name: 'Spain',
+						value: 46182.038
+					  }, {
+						name: 'Estonia',
+						value: 1298.533
+					  }, {
+						name: 'Ethiopia',
+						value: 87095.281
+					  }, {
+						name: 'Finland',
+						value: 5367.693
+					  }, {
+						name: 'Fiji',
+						value: 860.559
+					  }, {
+						name: 'Falkland Islands',
+						value: 49.581
+					  }, {
+						name: 'France',
+						value: 63230.866
+					  }, {
+						name: 'Gabon',
+						value: 1556.222
+					  }, {
+						name: 'United Kingdom',
+						value: 62066.35
+					  }, {
+						name: 'Georgia',
+						value: 4388.674
+					  }, {
+						name: 'Ghana',
+						value: 24262.901
+					  }, {
+						name: 'Guinea',
+						value: 10876.033
+					  }, {
+						name: 'Gambia',
+						value: 1680.64
+					  }, {
+						name: 'Guinea Bissau',
+						value: 10876.033
+					  }, {
+						name: 'Equatorial Guinea',
+						value: 696.167
+					  }, {
+						name: 'Greece',
+						value: 11109.999
+					  }, {
+						name: 'Greenland',
+						value: 56.546
+					  }, {
+						name: 'Guatemala',
+						value: 14341.576
+					  }, {
+						name: 'French Guiana',
+						value: 231.169
+					  }, {
+						name: 'Guyana',
+						value: 786.126
+					  }, {
+						name: 'Honduras',
+						value: 7621.204
+					  }, {
+						name: 'Croatia',
+						value: 4338.027
+					  }, {
+						name: 'Haiti',
+						value: 9896.4
+					  }, {
+						name: 'Hungary',
+						value: 10014.633
+					  }, {
+						name: 'Indonesia',
+						value: 240676.485
+					  }, {
+						name: 'India',
+						value: 1205624.648
+					  }, {
+						name: 'Ireland',
+						value: 4467.561
+					  }, {
+						name: 'Iran',
+						value: 240676.485
+					  }, {
+						name: 'Iraq',
+						value: 30962.38
+					  }, {
+						name: 'Iceland',
+						value: 318.042
+					  }, {
+						name: 'Israel',
+						value: 7420.368
+					  }, {
+						name: 'Italy',
+						value: 60508.978
+					  }, {
+						name: 'Jamaica',
+						value: 2741.485
+					  }, {
+						name: 'Jordan',
+						value: 6454.554
+					  }, {
+						name: 'Japan',
+						value: 127352.833
+					  }, {
+						name: 'Kazakhstan',
+						value: 15921.127
+					  }, {
+						name: 'Kenya',
+						value: 40909.194
+					  }, {
+						name: 'Kyrgyzstan',
+						value: 5334.223
+					  }, {
+						name: 'Cambodia',
+						value: 14364.931
+					  }, {
+						name: 'South Korea',
+						value: 51452.352
+					  }, {
+						name: 'Kosovo',
+						value: 97.743
+					  }, {
+						name: 'Kuwait',
+						value: 2991.58
+					  }, {
+						name: 'Laos',
+						value: 6395.713
+					  }, {
+						name: 'Lebanon',
+						value: 4341.092
+					  }, {
+						name: 'Liberia',
+						value: 3957.99
+					  }, {
+						name: 'Libya',
+						value: 6040.612
+					  }, {
+						name: 'Sri Lanka',
+						value: 20758.779
+					  }, {
+						name: 'Lesotho',
+						value: 2008.921
+					  }, {
+						name: 'Lithuania',
+						value: 3068.457
+					  }, {
+						name: 'Luxembourg',
+						value: 507.885
+					  }, {
+						name: 'Latvia',
+						value: 2090.519
+					  }, {
+						name: 'Morocco',
+						value: 31642.36
+					  }, {
+						name: 'Moldova',
+						value: 103.619
+					  }, {
+						name: 'Madagascar',
+						value: 21079.532
+					  }, {
+						name: 'Mexico',
+						value: 117886.404
+					  }, {
+						name: 'Macedonia',
+						value: 507.885
+					  }, {
+						name: 'Mali',
+						value: 13985.961
+					  }, {
+						name: 'Myanmar',
+						value: 51931.231
+					  }, {
+						name: 'Montenegro',
+						value: 620.078
+					  }, {
+						name: 'Mongolia',
+						value: 2712.738
+					  }, {
+						name: 'Mozambique',
+						value: 23967.265
+					  }, {
+						name: 'Mauritania',
+						value: 3609.42
+					  }, {
+						name: 'Malawi',
+						value: 15013.694
+					  }, {
+						name: 'Malaysia',
+						value: 28275.835
+					  }, {
+						name: 'Namibia',
+						value: 2178.967
+					  }, {
+						name: 'New Caledonia',
+						value: 246.379
+					  }, {
+						name: 'Niger',
+						value: 15893.746
+					  }, {
+						name: 'Nigeria',
+						value: 159707.78
+					  }, {
+						name: 'Nicaragua',
+						value: 5822.209
+					  }, {
+						name: 'Netherlands',
+						value: 16615.243
+					  }, {
+						name: 'Norway',
+						value: 4891.251
+					  }, {
+						name: 'Nepal',
+						value: 26846.016
+					  }, {
+						name: 'New Zealand',
+						value: 4368.136
+					  }, {
+						name: 'Oman',
+						value: 2802.768
+					  }, {
+						name: 'Pakistan',
+						value: 173149.306
+					  }, {
+						name: 'Panama',
+						value: 3678.128
+					  }, {
+						name: 'Peru',
+						value: 29262.83
+					  }, {
+						name: 'Philippines',
+						value: 93444.322
+					  }, {
+						name: 'Papua New Guinea',
+						value: 6858.945
+					  }, {
+						name: 'Poland',
+						value: 38198.754
+					  }, {
+						name: 'Puerto Rico',
+						value: 3709.671
+					  }, {
+						name: 'North Korea',
+						value: 1.468
+					  }, {
+						name: 'Portugal',
+						value: 10589.792
+					  }, {
+						name: 'Paraguay',
+						value: 6459.721
+					  }, {
+						name: 'Qatar',
+						value: 1749.713
+					  }, {
+						name: 'Romania',
+						value: 21861.476
+					  }, {
+						name: 'Russia',
+						value: 21861.476
+					  }, {
+						name: 'Rwanda',
+						value: 10836.732
+					  }, {
+						name: 'Western Sahara',
+						value: 514.648
+					  }, {
+						name: 'Saudi Arabia',
+						value: 27258.387
+					  }, {
+						name: 'Sudan',
+						value: 35652.002
+					  }, {
+						name: 'South Sudan',
+						value: 9940.929
+					  }, {
+						name: 'Senegal',
+						value: 12950.564
+					  }, {
+						name: 'Solomon Islands',
+						value: 526.447
+					  }, {
+						name: 'Sierra Leone',
+						value: 5751.976
+					  }, {
+						name: 'El Salvador',
+						value: 6218.195
+					  }, {
+						name: 'Somaliland',
+						value: 9636.173
+					  }, {
+						name: 'Somalia',
+						value: 9636.173
+					  }, {
+						name: 'Republic of Serbia',
+						value: 3573.024
+					  }, {
+						name: 'Suriname',
+						value: 524.96
+					  }, {
+						name: 'Slovakia',
+						value: 5433.437
+					  }, {
+						name: 'Slovenia',
+						value: 2054.232
+					  }, {
+						name: 'Sweden',
+						value: 9382.297
+					  }, {
+						name: 'Swaziland',
+						value: 1193.148
+					  }, {
+						name: 'Syria',
+						value: 7830.534
+					  }, {
+						name: 'Chad',
+						value: 11720.781
+					  }, {
+						name: 'Togo',
+						value: 6306.014
+					  }, {
+						name: 'Thailand',
+						value: 66402.316
+					  }, {
+						name: 'Tajikistan',
+						value: 7627.326
+					  }, {
+						name: 'Turkmenistan',
+						value: 5041.995
+					  }, {
+						name: 'East Timor',
+						value: 10016.797
+					  }, {
+						name: 'Trinidad and Tobago',
+						value: 1328.095
+					  }, {
+						name: 'Tunisia',
+						value: 10631.83
+					  }, {
+						name: 'Turkey',
+						value: 72137.546
+					  }, {
+						name: 'United Republic of Tanzania',
+						value: 44973.33
+					  }, {
+						name: 'Uganda',
+						value: 33987.213
+					  }, {
+						name: 'Ukraine',
+						value: 46050.22
+					  }, {
+						name: 'Uruguay',
+						value: 3371.982
+					  }, {
+						name: 'United States of America',
+						value: 312247.116
+					  }, {
+						name: 'Uzbekistan',
+						value: 27769.27
+					  }, {
+						name: 'Venezuela',
+						value: 236.299
+					  }, {
+						name: 'Vietnam',
+						value: 89047.397
+					  }, {
+						name: 'Vanuatu',
+						value: 236.299
+					  }, {
+						name: 'West Bank',
+						value: 13.565
+					  }, {
+						name: 'Yemen',
+						value: 22763.008
+					  }, {
+						name: 'South Africa',
+						value: 51452.352
+					  }, {
+						name: 'Zambia',
+						value: 13216.985
+					  }, {
+						name: 'Zimbabwe',
+						value: 13076.978
+					  }]
+					}]
+				  });
+	   
+			}
+	   
+		}  
+	   
+	   
+	$(document).ready(function() {
+				
+		init_sparklines();
+		init_flot_chart();
+		init_sidebar();
+		init_wysiwyg();
+		init_InputMask();
+		init_JQVmap();
+		init_cropper();
+		init_knob();
+		init_IonRangeSlider();
+		init_ColorPicker();
+		init_TagsInput();
+		init_parsley();
+		init_daterangepicker();
+		init_daterangepicker_right();
+		init_daterangepicker_single_call();
+		init_daterangepicker_reservation();
+		init_SmartWizard();
+		init_EasyPieChart();
+		init_charts();
+		init_echarts();
+		init_morris_charts();
+		init_skycons();
+		init_select2();
+		init_validator();
+		init_DataTables();
+		init_chart_doughnut();
+		init_gauge();
+		init_PNotify();
+		init_starrr();
+		init_calendar();
+		init_compose();
+		init_CustomNotification();
+		init_autosize();
+		init_autocomplete();
+				
+	});	
+	
+
 
 
 /***/ }),
 /* 8 */
-/***/ (function(module, exports) {
-
-/*! AdminLTE app.js
-* ================
-* Main JS application file for AdminLTE v2. This file
-* should be included in all pages. It controls some layout
-* options and implements exclusive AdminLTE plugins.
-*
-* @Author  Almsaeed Studio
-* @Support <https://www.almsaeedstudio.com>
-* @Email   <abdullah@almsaeedstudio.com>
-* @version 2.4.0
-* @repository git://github.com/almasaeed2010/AdminLTE.git
-* @license MIT <http://opensource.org/licenses/MIT>
-*/
-
-// Make sure jQuery has been loaded
-if (typeof jQuery === 'undefined') {
-throw new Error('AdminLTE requires jQuery')
-}
-
-/* BoxRefresh()
- * =========
- * Adds AJAX content control to a box.
- *
- * @Usage: $('#my-box').boxRefresh(options)
- *         or add [data-widget="box-refresh"] to the box element
- *         Pass any option as data-option="value"
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.boxrefresh'
-
-  var Default = {
-    source         : '',
-    params         : {},
-    trigger        : '.refresh-btn',
-    content        : '.box-body',
-    loadInContent  : true,
-    responseType   : '',
-    overlayTemplate: '<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>',
-    onLoadStart    : function () {
-    },
-    onLoadDone     : function (response) {
-      return response
-    }
-  }
-
-  var Selector = {
-    data: '[data-widget="box-refresh"]'
-  }
-
-  // BoxRefresh Class Definition
-  // =========================
-  var BoxRefresh = function (element, options) {
-    this.element  = element
-    this.options  = options
-    this.$overlay = $(options.overlay)
-
-    if (options.source === '') {
-      throw new Error('Source url was not defined. Please specify a url in your BoxRefresh source option.')
-    }
-
-    this._setUpListeners()
-    this.load()
-  }
-
-  BoxRefresh.prototype.load = function () {
-    this._addOverlay()
-    this.options.onLoadStart.call($(this))
-
-    $.get(this.options.source, this.options.params, function (response) {
-      if (this.options.loadInContent) {
-        $(this.options.content).html(response)
-      }
-      this.options.onLoadDone.call($(this), response)
-      this._removeOverlay()
-    }.bind(this), this.options.responseType !== '' && this.options.responseType)
-  }
-
-  // Private
-
-  BoxRefresh.prototype._setUpListeners = function () {
-    $(this.element).on('click', Selector.trigger, function (event) {
-      if (event) event.preventDefault()
-      this.load()
-    }.bind(this))
-  }
-
-  BoxRefresh.prototype._addOverlay = function () {
-    $(this.element).append(this.$overlay)
-  }
-
-  BoxRefresh.prototype._removeOverlay = function () {
-    $(this.element).remove(this.$overlay)
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option == 'object' && option)
-        $this.data(DataKey, (data = new BoxRefresh($this, options)))
-      }
-
-      if (typeof data == 'string') {
-        if (typeof data[option] == 'undefined') {
-          throw new Error('No method named ' + option)
-        }
-        data[option]()
-      }
-    })
-  }
-
-  var old = $.fn.boxRefresh
-
-  $.fn.boxRefresh             = Plugin
-  $.fn.boxRefresh.Constructor = BoxRefresh
-
-  // No Conflict Mode
-  // ================
-  $.fn.boxRefresh.noConflict = function () {
-    $.fn.boxRefresh = old
-    return this
-  }
-
-  // BoxRefresh Data API
-  // =================
-  $(window).on('load', function () {
-    $(Selector.data).each(function () {
-      Plugin.call($(this))
-    })
-  })
-
-}(jQuery)
-
-
-/* BoxWidget()
- * ======
- * Adds box widget functions to boxes.
- *
- * @Usage: $('.my-box').boxWidget(options)
- *         This plugin auto activates on any element using the `.box` class
- *         Pass any option as data-option="value"
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.boxwidget'
-
-  var Default = {
-    animationSpeed : 500,
-    collapseTrigger: '[data-widget="collapse"]',
-    removeTrigger  : '[data-widget="remove"]',
-    collapseIcon   : 'fa-minus',
-    expandIcon     : 'fa-plus',
-    removeIcon     : 'fa-times'
-  }
-
-  var Selector = {
-    data     : '.box',
-    collapsed: '.collapsed-box',
-    body     : '.box-body',
-    footer   : '.box-footer',
-    tools    : '.box-tools'
-  }
-
-  var ClassName = {
-    collapsed: 'collapsed-box'
-  }
-
-  var Event = {
-    collapsed: 'collapsed.boxwidget',
-    expanded : 'expanded.boxwidget',
-    removed  : 'removed.boxwidget'
-  }
-
-  // BoxWidget Class Definition
-  // =====================
-  var BoxWidget = function (element, options) {
-    this.element = element
-    this.options = options
-
-    this._setUpListeners()
-  }
-
-  BoxWidget.prototype.toggle = function () {
-    var isOpen = !$(this.element).is(Selector.collapsed)
-
-    if (isOpen) {
-      this.collapse()
-    } else {
-      this.expand()
-    }
-  }
-
-  BoxWidget.prototype.expand = function () {
-    var expandedEvent = $.Event(Event.expanded)
-    var collapseIcon  = this.options.collapseIcon
-    var expandIcon    = this.options.expandIcon
-
-    $(this.element).removeClass(ClassName.collapsed)
-
-    $(this.element)
-      .find(Selector.tools)
-      .find('.' + expandIcon)
-      .removeClass(expandIcon)
-      .addClass(collapseIcon)
-
-    $(this.element).find(Selector.body + ', ' + Selector.footer)
-      .slideDown(this.options.animationSpeed, function () {
-        $(this.element).trigger(expandedEvent)
-      }.bind(this))
-  }
-
-  BoxWidget.prototype.collapse = function () {
-    var collapsedEvent = $.Event(Event.collapsed)
-    var collapseIcon   = this.options.collapseIcon
-    var expandIcon     = this.options.expandIcon
-
-    $(this.element)
-      .find(Selector.tools)
-      .find('.' + collapseIcon)
-      .removeClass(collapseIcon)
-      .addClass(expandIcon)
-
-    $(this.element).find(Selector.body + ', ' + Selector.footer)
-      .slideUp(this.options.animationSpeed, function () {
-        $(this.element).addClass(ClassName.collapsed)
-        $(this.element).trigger(collapsedEvent)
-      }.bind(this))
-  }
-
-  BoxWidget.prototype.remove = function () {
-    var removedEvent = $.Event(Event.removed)
-
-    $(this.element).slideUp(this.options.animationSpeed, function () {
-      $(this.element).trigger(removedEvent)
-      $(this.element).remove()
-    }.bind(this))
-  }
-
-  // Private
-
-  BoxWidget.prototype._setUpListeners = function () {
-    var that = this
-
-    $(this.element).on('click', this.options.collapseTrigger, function (event) {
-      if (event) event.preventDefault()
-      that.toggle()
-    })
-
-    $(this.element).on('click', this.options.removeTrigger, function (event) {
-      if (event) event.preventDefault()
-      that.remove()
-    })
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option == 'object' && option)
-        $this.data(DataKey, (data = new BoxWidget($this, options)))
-      }
-
-      if (typeof option == 'string') {
-        if (typeof data[option] == 'undefined') {
-          throw new Error('No method named ' + option)
-        }
-        data[option]()
-      }
-    })
-  }
-
-  var old = $.fn.boxWidget
-
-  $.fn.boxWidget             = Plugin
-  $.fn.boxWidget.Constructor = BoxWidget
-
-  // No Conflict Mode
-  // ================
-  $.fn.boxWidget.noConflict = function () {
-    $.fn.boxWidget = old
-    return this
-  }
-
-  // BoxWidget Data API
-  // ==================
-  $(window).on('load', function () {
-    $(Selector.data).each(function () {
-      Plugin.call($(this))
-    })
-  })
-
-}(jQuery)
-
-
-/* ControlSidebar()
- * ===============
- * Toggles the state of the control sidebar
- *
- * @Usage: $('#control-sidebar-trigger').controlSidebar(options)
- *         or add [data-toggle="control-sidebar"] to the trigger
- *         Pass any option as data-option="value"
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.controlsidebar'
-
-  var Default = {
-    slide: true
-  }
-
-  var Selector = {
-    sidebar: '.control-sidebar',
-    data   : '[data-toggle="control-sidebar"]',
-    open   : '.control-sidebar-open',
-    bg     : '.control-sidebar-bg',
-    wrapper: '.wrapper',
-    content: '.content-wrapper',
-    boxed  : '.layout-boxed'
-  }
-
-  var ClassName = {
-    open : 'control-sidebar-open',
-    fixed: 'fixed'
-  }
-
-  var Event = {
-    collapsed: 'collapsed.controlsidebar',
-    expanded : 'expanded.controlsidebar'
-  }
-
-  // ControlSidebar Class Definition
-  // ===============================
-  var ControlSidebar = function (element, options) {
-    this.element         = element
-    this.options         = options
-    this.hasBindedResize = false
-
-    this.init()
-  }
-
-  ControlSidebar.prototype.init = function () {
-    // Add click listener if the element hasn't been
-    // initialized using the data API
-    if (!$(this.element).is(Selector.data)) {
-      $(this).on('click', this.toggle)
-    }
-
-    this.fix()
-    $(window).resize(function () {
-      this.fix()
-    }.bind(this))
-  }
-
-  ControlSidebar.prototype.toggle = function (event) {
-    if (event) event.preventDefault()
-
-    this.fix()
-
-    if (!$(Selector.sidebar).is(Selector.open) && !$('body').is(Selector.open)) {
-      this.expand()
-    } else {
-      this.collapse()
-    }
-  }
-
-  ControlSidebar.prototype.expand = function () {
-    if (!this.options.slide) {
-      $('body').addClass(ClassName.open)
-    } else {
-      $(Selector.sidebar).addClass(ClassName.open)
-    }
-
-    $(this.element).trigger($.Event(Event.expanded))
-  }
-
-  ControlSidebar.prototype.collapse = function () {
-    $('body, ' + Selector.sidebar).removeClass(ClassName.open)
-    $(this.element).trigger($.Event(Event.collapsed))
-  }
-
-  ControlSidebar.prototype.fix = function () {
-    if ($('body').is(Selector.boxed)) {
-      this._fixForBoxed($(Selector.bg))
-    }
-  }
-
-  // Private
-
-  ControlSidebar.prototype._fixForBoxed = function (bg) {
-    bg.css({
-      position: 'absolute',
-      height  : $(Selector.wrapper).height()
-    })
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option == 'object' && option)
-        $this.data(DataKey, (data = new ControlSidebar($this, options)))
-      }
-
-      if (typeof option == 'string') data.toggle()
-    })
-  }
-
-  var old = $.fn.controlSidebar
-
-  $.fn.controlSidebar             = Plugin
-  $.fn.controlSidebar.Constructor = ControlSidebar
-
-  // No Conflict Mode
-  // ================
-  $.fn.controlSidebar.noConflict = function () {
-    $.fn.controlSidebar = old
-    return this
-  }
-
-  // ControlSidebar Data API
-  // =======================
-  $(document).on('click', Selector.data, function (event) {
-    if (event) event.preventDefault()
-    Plugin.call($(this), 'toggle')
-  })
-
-}(jQuery)
-
-
-/* DirectChat()
- * ===============
- * Toggles the state of the control sidebar
- *
- * @Usage: $('#my-chat-box').directChat()
- *         or add [data-widget="direct-chat"] to the trigger
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.directchat'
-
-  var Selector = {
-    data: '[data-widget="chat-pane-toggle"]',
-    box : '.direct-chat'
-  }
-
-  var ClassName = {
-    open: 'direct-chat-contacts-open'
-  }
-
-  // DirectChat Class Definition
-  // ===========================
-  var DirectChat = function (element) {
-    this.element = element
-  }
-
-  DirectChat.prototype.toggle = function ($trigger) {
-    $trigger.parents(Selector.box).first().toggleClass(ClassName.open)
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        $this.data(DataKey, (data = new DirectChat($this)))
-      }
-
-      if (typeof option == 'string') data.toggle($this)
-    })
-  }
-
-  var old = $.fn.directChat
-
-  $.fn.directChat             = Plugin
-  $.fn.directChat.Constructor = DirectChat
-
-  // No Conflict Mode
-  // ================
-  $.fn.directChat.noConflict = function () {
-    $.fn.directChat = old
-    return this
-  }
-
-  // DirectChat Data API
-  // ===================
-  $(document).on('click', Selector.data, function (event) {
-    if (event) event.preventDefault()
-    Plugin.call($(this), 'toggle')
-  })
-
-}(jQuery)
-
-
-/* Layout()
- * ========
- * Implements AdminLTE layout.
- * Fixes the layout height in case min-height fails.
- *
- * @usage activated automatically upon window load.
- *        Configure any options by passing data-option="value"
- *        to the body tag.
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.layout'
-
-  var Default = {
-    slimscroll : true,
-    resetHeight: true
-  }
-
-  var Selector = {
-    wrapper       : '.wrapper',
-    contentWrapper: '.content-wrapper',
-    layoutBoxed   : '.layout-boxed',
-    mainFooter    : '.main-footer',
-    mainHeader    : '.main-header',
-    sidebar       : '.sidebar',
-    controlSidebar: '.control-sidebar',
-    fixed         : '.fixed',
-    sidebarMenu   : '.sidebar-menu',
-    logo          : '.main-header .logo'
-  }
-
-  var ClassName = {
-    fixed         : 'fixed',
-    holdTransition: 'hold-transition'
-  }
-
-  var Layout = function (options) {
-    this.options      = options
-    this.bindedResize = false
-    this.activate()
-  }
-
-  Layout.prototype.activate = function () {
-    this.fix()
-    this.fixSidebar()
-
-    $('body').removeClass(ClassName.holdTransition)
-
-    if (this.options.resetHeight) {
-      $('body, html, ' + Selector.wrapper).css({
-        'height'    : 'auto',
-        'min-height': '100%'
-      })
-    }
-
-    if (!this.bindedResize) {
-      $(window).resize(function () {
-        this.fix()
-        this.fixSidebar()
-
-        $(Selector.logo + ', ' + Selector.sidebar).one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function () {
-          this.fix()
-          this.fixSidebar()
-        }.bind(this))
-      }.bind(this))
-
-      this.bindedResize = true
-    }
-
-    $(Selector.sidebarMenu).on('expanded.tree', function () {
-      this.fix()
-      this.fixSidebar()
-    }.bind(this))
-
-    $(Selector.sidebarMenu).on('collapsed.tree', function () {
-      this.fix()
-      this.fixSidebar()
-    }.bind(this))
-  }
-
-  Layout.prototype.fix = function () {
-    // Remove overflow from .wrapper if layout-boxed exists
-    $(Selector.layoutBoxed + ' > ' + Selector.wrapper).css('overflow', 'hidden')
-
-    // Get window height and the wrapper height
-    var footerHeight  = $(Selector.mainFooter).outerHeight() || 0
-    var neg           = $(Selector.mainHeader).outerHeight() + footerHeight
-    var windowHeight  = $(window).height()
-    var sidebarHeight = $(Selector.sidebar).height() || 0
-
-    // Set the min-height of the content and sidebar based on
-    // the height of the document.
-    if ($('body').hasClass(ClassName.fixed)) {
-      $(Selector.contentWrapper).css('min-height', windowHeight - footerHeight)
-    } else {
-      var postSetHeight
-
-      if (windowHeight >= sidebarHeight) {
-        $(Selector.contentWrapper).css('min-height', windowHeight - neg)
-        postSetHeight = windowHeight - neg
-      } else {
-        $(Selector.contentWrapper).css('min-height', sidebarHeight)
-        postSetHeight = sidebarHeight
-      }
-
-      // Fix for the control sidebar height
-      var $controlSidebar = $(Selector.controlSidebar)
-      if (typeof $controlSidebar !== 'undefined') {
-        if ($controlSidebar.height() > postSetHeight)
-          $(Selector.contentWrapper).css('min-height', $controlSidebar.height())
-      }
-    }
-  }
-
-  Layout.prototype.fixSidebar = function () {
-    // Make sure the body tag has the .fixed class
-    if (!$('body').hasClass(ClassName.fixed)) {
-      if (typeof $.fn.slimScroll !== 'undefined') {
-        $(Selector.sidebar).slimScroll({ destroy: true }).height('auto')
-      }
-      return
-    }
-
-    // Enable slimscroll for fixed layout
-    if (this.options.slimscroll) {
-      if (typeof $.fn.slimScroll !== 'undefined') {
-        // Destroy if it exists
-        // $(Selector.sidebar).slimScroll({ destroy: true }).height('auto')
-
-        // Add slimscroll
-        $(Selector.sidebar).slimScroll({
-          height: ($(window).height() - $(Selector.mainHeader).height()) + 'px',
-          color : 'rgba(0,0,0,0.2)',
-          size  : '3px'
-        })
-      }
-    }
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option === 'object' && option)
-        $this.data(DataKey, (data = new Layout(options)))
-      }
-
-      if (typeof option === 'string') {
-        if (typeof data[option] === 'undefined') {
-          throw new Error('No method named ' + option)
-        }
-        data[option]()
-      }
-    })
-  }
-
-  var old = $.fn.layout
-
-  $.fn.layout            = Plugin
-  $.fn.layout.Constuctor = Layout
-
-  // No conflict mode
-  // ================
-  $.fn.layout.noConflict = function () {
-    $.fn.layout = old
-    return this
-  }
-
-  // Layout DATA-API
-  // ===============
-  $(window).on('load', function () {
-    Plugin.call($('body'))
-  })
-}(jQuery)
-
-
-/* PushMenu()
- * ==========
- * Adds the push menu functionality to the sidebar.
- *
- * @usage: $('.btn').pushMenu(options)
- *          or add [data-toggle="push-menu"] to any button
- *          Pass any option as data-option="value"
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.pushmenu'
-
-  var Default = {
-    collapseScreenSize   : 767,
-    expandOnHover        : false,
-    expandTransitionDelay: 200
-  }
-
-  var Selector = {
-    collapsed     : '.sidebar-collapse',
-    open          : '.sidebar-open',
-    mainSidebar   : '.main-sidebar',
-    contentWrapper: '.content-wrapper',
-    searchInput   : '.sidebar-form .form-control',
-    button        : '[data-toggle="push-menu"]',
-    mini          : '.sidebar-mini',
-    expanded      : '.sidebar-expanded-on-hover',
-    layoutFixed   : '.fixed'
-  }
-
-  var ClassName = {
-    collapsed    : 'sidebar-collapse',
-    open         : 'sidebar-open',
-    mini         : 'sidebar-mini',
-    expanded     : 'sidebar-expanded-on-hover',
-    expandFeature: 'sidebar-mini-expand-feature',
-    layoutFixed  : 'fixed'
-  }
-
-  var Event = {
-    expanded : 'expanded.pushMenu',
-    collapsed: 'collapsed.pushMenu'
-  }
-
-  // PushMenu Class Definition
-  // =========================
-  var PushMenu = function (options) {
-    this.options = options
-    this.init()
-  }
-
-  PushMenu.prototype.init = function () {
-    if (this.options.expandOnHover
-      || ($('body').is(Selector.mini + Selector.layoutFixed))) {
-      this.expandOnHover()
-      $('body').addClass(ClassName.expandFeature)
-    }
-
-    $(Selector.contentWrapper).click(function () {
-      // Enable hide menu when clicking on the content-wrapper on small screens
-      if ($(window).width() <= this.options.collapseScreenSize && $('body').hasClass(ClassName.open)) {
-        this.close()
-      }
-    }.bind(this))
-
-    // __Fix for android devices
-    $(Selector.searchInput).click(function (e) {
-      e.stopPropagation()
-    })
-  }
-
-  PushMenu.prototype.toggle = function () {
-    var windowWidth = $(window).width()
-    var isOpen      = !$('body').hasClass(ClassName.collapsed)
-
-    if (windowWidth <= this.options.collapseScreenSize) {
-      isOpen = $('body').hasClass(ClassName.open)
-    }
-
-    if (!isOpen) {
-      this.open()
-    } else {
-      this.close()
-    }
-  }
-
-  PushMenu.prototype.open = function () {
-    var windowWidth = $(window).width()
-
-    if (windowWidth > this.options.collapseScreenSize) {
-      $('body').removeClass(ClassName.collapsed)
-        .trigger($.Event(Event.expanded))
-    }
-    else {
-      $('body').addClass(ClassName.open)
-        .trigger($.Event(Event.expanded))
-    }
-  }
-
-  PushMenu.prototype.close = function () {
-    var windowWidth = $(window).width()
-    if (windowWidth > this.options.collapseScreenSize) {
-      $('body').addClass(ClassName.collapsed)
-        .trigger($.Event(Event.collapsed))
-    } else {
-      $('body').removeClass(ClassName.open + ' ' + ClassName.collapsed)
-        .trigger($.Event(Event.collapsed))
-    }
-  }
-
-  PushMenu.prototype.expandOnHover = function () {
-    $(Selector.mainSidebar).hover(function () {
-      if ($('body').is(Selector.mini + Selector.collapsed)
-        && $(window).width() > this.options.collapseScreenSize) {
-        this.expand()
-      }
-    }.bind(this), function () {
-      if ($('body').is(Selector.expanded)) {
-        this.collapse()
-      }
-    }.bind(this))
-  }
-
-  PushMenu.prototype.expand = function () {
-    setTimeout(function () {
-      $('body').removeClass(ClassName.collapsed)
-        .addClass(ClassName.expanded)
-    }, this.options.expandTransitionDelay)
-  }
-
-  PushMenu.prototype.collapse = function () {
-    setTimeout(function () {
-      $('body').removeClass(ClassName.expanded)
-        .addClass(ClassName.collapsed)
-    }, this.options.expandTransitionDelay)
-  }
-
-  // PushMenu Plugin Definition
-  // ==========================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option == 'object' && option)
-        $this.data(DataKey, (data = new PushMenu(options)))
-      }
-
-      if (option === 'toggle') data.toggle()
-    })
-  }
-
-  var old = $.fn.pushMenu
-
-  $.fn.pushMenu             = Plugin
-  $.fn.pushMenu.Constructor = PushMenu
-
-  // No Conflict Mode
-  // ================
-  $.fn.pushMenu.noConflict = function () {
-    $.fn.pushMenu = old
-    return this
-  }
-
-  // Data API
-  // ========
-  $(document).on('click', Selector.button, function (e) {
-    e.preventDefault()
-    Plugin.call($(this), 'toggle')
-  })
-  $(window).on('load', function () {
-    Plugin.call($(Selector.button))
-  })
-}(jQuery)
-
-
-/* TodoList()
- * =========
- * Converts a list into a todoList.
- *
- * @Usage: $('.my-list').todoList(options)
- *         or add [data-widget="todo-list"] to the ul element
- *         Pass any option as data-option="value"
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.todolist'
-
-  var Default = {
-    onCheck  : function (item) {
-      return item
-    },
-    onUnCheck: function (item) {
-      return item
-    }
-  }
-
-  var Selector = {
-    data: '[data-widget="todo-list"]'
-  }
-
-  var ClassName = {
-    done: 'done'
-  }
-
-  // TodoList Class Definition
-  // =========================
-  var TodoList = function (element, options) {
-    this.element = element
-    this.options = options
-
-    this._setUpListeners()
-  }
-
-  TodoList.prototype.toggle = function (item) {
-    item.parents(Selector.li).first().toggleClass(ClassName.done)
-    if (!item.prop('checked')) {
-      this.unCheck(item)
-      return
-    }
-
-    this.check(item)
-  }
-
-  TodoList.prototype.check = function (item) {
-    this.options.onCheck.call(item)
-  }
-
-  TodoList.prototype.unCheck = function (item) {
-    this.options.onUnCheck.call(item)
-  }
-
-  // Private
-
-  TodoList.prototype._setUpListeners = function () {
-    var that = this
-    $(this.element).on('change ifChanged', 'input:checkbox', function () {
-      that.toggle($(this))
-    })
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option == 'object' && option)
-        $this.data(DataKey, (data = new TodoList($this, options)))
-      }
-
-      if (typeof data == 'string') {
-        if (typeof data[option] == 'undefined') {
-          throw new Error('No method named ' + option)
-        }
-        data[option]()
-      }
-    })
-  }
-
-  var old = $.fn.todoList
-
-  $.fn.todoList         = Plugin
-  $.fn.todoList.Constructor = TodoList
-
-  // No Conflict Mode
-  // ================
-  $.fn.todoList.noConflict = function () {
-    $.fn.todoList = old
-    return this
-  }
-
-  // TodoList Data API
-  // =================
-  $(window).on('load', function () {
-    $(Selector.data).each(function () {
-      Plugin.call($(this))
-    })
-  })
-
-}(jQuery)
-
-
-/* Tree()
- * ======
- * Converts a nested list into a multilevel
- * tree view menu.
- *
- * @Usage: $('.my-menu').tree(options)
- *         or add [data-widget="tree"] to the ul element
- *         Pass any option as data-option="value"
- */
-+function ($) {
-  'use strict'
-
-  var DataKey = 'lte.tree'
-
-  var Default = {
-    animationSpeed: 500,
-    accordion     : true,
-    followLink    : false,
-    trigger       : '.treeview a'
-  }
-
-  var Selector = {
-    tree        : '.tree',
-    treeview    : '.treeview',
-    treeviewMenu: '.treeview-menu',
-    open        : '.menu-open, .active',
-    li          : 'li',
-    data        : '[data-widget="tree"]',
-    active      : '.active'
-  }
-
-  var ClassName = {
-    open: 'menu-open',
-    tree: 'tree'
-  }
-
-  var Event = {
-    collapsed: 'collapsed.tree',
-    expanded : 'expanded.tree'
-  }
-
-  // Tree Class Definition
-  // =====================
-  var Tree = function (element, options) {
-    this.element = element
-    this.options = options
-
-    $(this.element).addClass(ClassName.tree)
-
-    $(Selector.treeview + Selector.active, this.element).addClass(ClassName.open)
-
-    this._setUpListeners()
-  }
-
-  Tree.prototype.toggle = function (link, event) {
-    var treeviewMenu = link.next(Selector.treeviewMenu)
-    var parentLi     = link.parent()
-    var isOpen       = parentLi.hasClass(ClassName.open)
-
-    if (!parentLi.is(Selector.treeview)) {
-      return
-    }
-
-    if (!this.options.followLink || link.attr('href') === '#') {
-      event.preventDefault()
-    }
-
-    if (isOpen) {
-      this.collapse(treeviewMenu, parentLi)
-    } else {
-      this.expand(treeviewMenu, parentLi)
-    }
-  }
-
-  Tree.prototype.expand = function (tree, parent) {
-    var expandedEvent = $.Event(Event.expanded)
-
-    if (this.options.accordion) {
-      var openMenuLi = parent.siblings(Selector.open)
-      var openTree   = openMenuLi.children(Selector.treeviewMenu)
-      this.collapse(openTree, openMenuLi)
-    }
-
-    parent.addClass(ClassName.open)
-    tree.slideDown(this.options.animationSpeed, function () {
-      $(this.element).trigger(expandedEvent)
-    }.bind(this))
-  }
-
-  Tree.prototype.collapse = function (tree, parentLi) {
-    var collapsedEvent = $.Event(Event.collapsed)
-
-    tree.find(Selector.open).removeClass(ClassName.open)
-    parentLi.removeClass(ClassName.open)
-    tree.slideUp(this.options.animationSpeed, function () {
-      tree.find(Selector.open + ' > ' + Selector.treeview).slideUp()
-      $(this.element).trigger(collapsedEvent)
-    }.bind(this))
-  }
-
-  // Private
-
-  Tree.prototype._setUpListeners = function () {
-    var that = this
-
-    $(this.element).on('click', this.options.trigger, function (event) {
-      that.toggle($(this), event)
-    })
-  }
-
-  // Plugin Definition
-  // =================
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data(DataKey)
-
-      if (!data) {
-        var options = $.extend({}, Default, $this.data(), typeof option == 'object' && option)
-        $this.data(DataKey, new Tree($this, options))
-      }
-    })
-  }
-
-  var old = $.fn.tree
-
-  $.fn.tree             = Plugin
-  $.fn.tree.Constructor = Tree
-
-  // No Conflict Mode
-  // ================
-  $.fn.tree.noConflict = function () {
-    $.fn.tree = old
-    return this
-  }
-
-  // Tree Data API
-  // =============
-  $(window).on('load', function () {
-    $(Selector.data).each(function () {
-      Plugin.call($(this))
-    })
-  })
-
-}(jQuery)
-
-
-/***/ }),
-/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -15579,13 +19152,13 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
 	if (true) {
 		// CommonJS
-		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(1), __webpack_require__(11), __webpack_require__(2), __webpack_require__(14));
+		module.exports = exports = factory(__webpack_require__(0), __webpack_require__(1), __webpack_require__(10), __webpack_require__(2), __webpack_require__(13));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
@@ -15816,7 +19389,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -16089,7 +19662,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -16244,7 +19817,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -16392,7 +19965,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory, undef) {
@@ -17277,7 +20850,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -17300,7 +20873,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 ;(function (root, factory) {
@@ -17381,7 +20954,7 @@ throw new Error('AdminLTE requires jQuery')
 }));
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

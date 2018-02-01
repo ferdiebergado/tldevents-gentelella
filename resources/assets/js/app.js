@@ -166,7 +166,7 @@ var readURL = function(input) {
 
 $(function() {
 
-  $('.sidebar-menu').tree();
+  // $('.sidebar-menu').tree();
 
   $('#logout').click(function(event) {
     event.preventDefault();
